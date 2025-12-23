@@ -5,6 +5,7 @@ help:
 	@echo "  make install    - Install dependencies"
 	@echo "  make test       - Run unit tests with pytest"
 	@echo "  make lint       - Run and fix linting checks with ruff"
+	@echo "  make hf_cache   - Hugging face locally downloaded models data"
 
 install:
 	uv sync
@@ -15,3 +16,12 @@ test:
 lint:
 	uv run ruff check .
 	uv run ruff format --check .
+
+hf_cache:
+	@echo "\nCache Location: ~/.cache/huggingface/"
+	@echo "\nTotal Size:"
+	@du -sh ~/.cache/huggingface/
+	@echo "\nSize by Model:"
+	@du -sh ~/.cache/huggingface/hub/models--* 2>/dev/null || echo "No models cached"
+	@echo "\nAll Cached Items:"
+	@ls -lh ~/.cache/huggingface/hub/ 2>/dev/null || echo "Cache directory not found"
