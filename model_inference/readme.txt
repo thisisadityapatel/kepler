@@ -1,26 +1,26 @@
 Inference Engines
 
-Engine: vLLM
+vLLM
   Speed: Very Fast
   Hardware Needs: High-end GPU
   Best Use Case: Multi-user serving
 
-Engine: TensorRT-LLM
+TensorRT-LLM
   Speed: Fastest
   Hardware Needs: NVIDIA GPU (required)
   Best Use Case: Production, max performance
 
-Engine: llama.cpp
+llama.cpp
   Speed: Moderate
   Hardware Needs: CPU/Any GPU
   Best Use Case: Local, personal use
 
-Engine: ik_llama.cpp
+ik_llama.cpp
   Speed: Moderate-Fast
   Hardware Needs: CPU/Any GPU
   Best Use Case: Optimized local use
 
-Engine: SGLang
+SGLang
   Speed: Very Fast
   Hardware Needs: High-end GPU
   Best Use Case: Structured outputs, agents
