@@ -14,7 +14,7 @@ def main():
     sampling_params = SamplingParams(temperature=0.8, top_p=0.9, max_tokens=100)
 
     prompts = [
-        "What is the capital of France?",
+        "What is the capital of India?",
         "Write a haiku about programming.",
         "Explain what vLLM is in one sentence.",
     ]
