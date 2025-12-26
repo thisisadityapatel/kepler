@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+# MacOS (Automatically detect metal GPU apple silicon or CPU adoption).
+
 # Set the llama.cpp version (optional)
 ARG VERSION=master
 ARG GITHUB_REPO_LLAMA=https://github.com/ggerganov/llama.cpp.git
