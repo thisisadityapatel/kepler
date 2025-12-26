@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Production-grade LLM benchmarking framework for local inference."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "llama-cpp-python>=0.3.16",
+]
 
 [dependency-groups]
 dev = [
