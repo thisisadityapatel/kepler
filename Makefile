@@ -9,6 +9,7 @@ help:
 
 install:
 	uv sync
+	uv pip install -r requirements.txt
 
 test:
 	uv run pytest -v

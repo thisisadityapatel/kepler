@@ -1,4 +1,4 @@
-Download model gguf weights from hugging face using the huggingface-cli.
+Download model .gguf weights from hugging face using the huggingface-cli library.
 
 Example:
 
