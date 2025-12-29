@@ -1,0 +1,12 @@
+Initiating a docker container for the llama.cpp image for a specific .gguf model:
+
+```
+docker run \
+  -p 8080:8080 \
+  -v "$(pwd)/models:/models" \
+  kepler-llama:b7349 \
+  --model /models/qwen2.5-0.5b-instruct-q5_k_m.gguf \
+  --host 0.0.0.0 \
+  --port 8080 \
+  --ctx-size 4096
+```

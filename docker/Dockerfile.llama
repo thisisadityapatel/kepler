@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 # llama.cpp Server Docker Image
 # MacOS (Automatically detect metal GPU apple silicon or CPU adoption).
+# Docker on macOS runs Linux containers, not maxOS containers, hence it might not be able to access the metal GPUs and would run on CPUs.
 # Build with: docker build -f docker/Dockerfile.llama --build-arg VERSION=b7349 -t kepler-llama:b7349 .
 
 # Set the llama.cpp version (optional)
