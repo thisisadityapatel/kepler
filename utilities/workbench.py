@@ -125,6 +125,41 @@ Examples:
         model_name = model_path.stem
         repo_id = f"local/{model_name}"
 
+        # Step 2: Benchmark Selection (if not specified via args)
+        if not args.benchmark or args.benchmark == "standard":
+            print("\n🎯 Select Benchmark Type:")
+            print("1. Quick (2 iterations, simple questions)")
+            print("2. Standard (3 iterations, medium complexity)")
+            print("3. Performance (5 iterations, comprehensive)")
+            print("4. Hard Questions (3 challenging questions, 3 iterations each)")
+            print("5. Skip benchmarking")
+            
+            while True:
+                try:
+                    choice = input("\nSelect benchmark (1-5): ").strip()
+                    if choice == "1":
+                        selected_benchmark = "quick"
+                        break
+                    elif choice == "2":
+                        selected_benchmark = "standard"
+                        break
+                    elif choice == "3":
+                        selected_benchmark = "performance"
+                        break
+                    elif choice == "4":
+                        selected_benchmark = "hard"
+                        break
+                    elif choice == "5":
+                        selected_benchmark = "skip"
+                        break
+                    else:
+                        print("Please enter a number between 1-5")
+                except KeyboardInterrupt:
+                    print("\nExiting...")
+                    sys.exit(0)
+        else:
+            selected_benchmark = args.benchmark
+
         if not args.no_serve:
             # Step 2: Docker Setup
             with tracker.step("Docker Setup"):
@@ -146,7 +181,7 @@ Examples:
                     raise RuntimeError("Model server did not become ready")
 
         # Step 5: Benchmarking
-        if args.benchmark != "skip":
+        if selected_benchmark != "skip":
             with tracker.step("Benchmarking"):
                 benchmark_configs = {
                     "quick": [QUICK_BENCHMARK],
@@ -155,7 +190,7 @@ Examples:
                     "hard": HARD_QUESTIONS_BENCHMARK,
                 }
 
-                configs = benchmark_configs[args.benchmark]
+                configs = benchmark_configs[selected_benchmark]
                 
                 # Set host/port for all configs
                 for config in configs:
@@ -164,7 +199,7 @@ Examples:
 
                 runner = BenchmarkRunner()
                 
-                if args.benchmark == "hard":
+                if selected_benchmark == "hard":
                     # Run multiple benchmarks for hard questions
                     results = runner.run_multiple_benchmarks(
                         repo_id=repo_id,
