@@ -13,14 +13,15 @@ import argparse
 import sys
 from pathlib import Path
 
-from model_selector import select_model_interactive, find_gguf_models
-from docker_manager import create_llama_container
 from benchmark import (
-    BenchmarkRunner,
+    PERFORMANCE_BENCHMARK,
     QUICK_BENCHMARK,
     STANDARD_BENCHMARK,
-    PERFORMANCE_BENCHMARK,
+    BenchmarkRunner,
 )
+from docker_manager import create_llama_container
+from model_selector import find_gguf_models, select_model_interactive
+from progress_tracker import create_workbench_tracker, status_error, status_info
 
 
 def main():
@@ -31,10 +32,10 @@ def main():
 Examples:
   # Interactive mode - select model and run standard benchmark
   python workbench.py
-  
+
   # Quick benchmark with specific model
   python workbench.py --model models/qwen2.5-0.5b-instruct-q5_k_m.gguf --benchmark quick
-  
+
   # Performance benchmark with custom port
   python workbench.py --model models/my-model.gguf --benchmark performance --port 8081
         """,
@@ -102,108 +103,101 @@ Examples:
             print("❌ No GGUF models found in models/ directory")
         return
 
-    print("🚀 Welcome to Kepler LLM Workbench!")
-    print("   macOS-optimized LLM serving and benchmarking")
-
-    # Step 1: Model Selection
-    if args.model:
-        model_path = Path(args.model)
-        if not model_path.exists():
-            print(f"❌ Model file not found: {model_path}")
-            sys.exit(1)
-        print(f"📁 Using specified model: {model_path.name}")
-    else:
-        model_path = select_model_interactive()
-        if not model_path:
-            print("👋 No model selected. Exiting.")
-            sys.exit(0)
-
-    # Extract model info
-    model_name = model_path.stem
-    repo_id = f"local/{model_name}"  # Since we're using local files
-
-    print(f"\n-- Selected model: {model_name}")
-    print(f"-- Path: {model_path}")
+    # Create progress tracker
+    tracker = create_workbench_tracker()
 
     container = None
     try:
+        # Step 1: Model Selection
+        with tracker.step("Model Selection"):
+            if args.model:
+                model_path = Path(args.model)
+                if not model_path.exists():
+                    raise FileNotFoundError(f"Model file not found: {model_path}")
+            else:
+                model_path = select_model_interactive()
+                if not model_path:
+                    status_info("No model selected. Exiting.")
+                    sys.exit(0)
+
+        # Extract model info
+        model_name = model_path.stem
+        repo_id = f"local/{model_name}"
+
         if not args.no_serve:
-            # Step 2: Container Setup and Model Serving
-            print("\n-- Setting up Docker container...")
-            container, docker_cmd = create_llama_container(
-                model_path=model_path,
-                port=args.port,
-                ctx_size=args.ctx_size,
-                version=args.version,
-            )
+            # Step 2: Docker Setup
+            with tracker.step("Docker Setup"):
+                container, docker_cmd = create_llama_container(
+                    model_path=model_path,
+                    port=args.port,
+                    ctx_size=args.ctx_size,
+                    version=args.version,
+                )
 
-            # Start the container
-            if not container.start_container(docker_cmd):
-                print("-- Failed to start container")
-                sys.exit(1)
+            # Step 3: Container Start
+            with tracker.step("Container Start"):
+                if not container.start_container(docker_cmd):
+                    raise RuntimeError("Failed to start container")
 
-            # Wait for model to be ready
-            if not container.wait_for_ready(timeout=120):
-                print("-- Model server did not become ready")
-                sys.exit(1)
+            # Step 4: Health Check
+            with tracker.step("Health Check"):
+                if not container.wait_for_ready(timeout=120):
+                    raise RuntimeError("Model server did not become ready")
 
-            print(f"-- Model server is running on http://localhost:{args.port}")
-
-        # Step 3: Benchmarking
+        # Step 5: Benchmarking
         if args.benchmark != "skip":
-            print(f"\n-- Starting {args.benchmark} benchmark...")
+            with tracker.step("Benchmarking"):
+                benchmark_configs = {
+                    "quick": QUICK_BENCHMARK,
+                    "standard": STANDARD_BENCHMARK,
+                    "performance": PERFORMANCE_BENCHMARK,
+                }
 
-            # Select benchmark configuration
-            benchmark_configs = {
-                "quick": QUICK_BENCHMARK,
-                "standard": STANDARD_BENCHMARK,
-                "performance": PERFORMANCE_BENCHMARK,
-            }
+                config = benchmark_configs[args.benchmark]
+                config.host = "localhost"
+                config.port = args.port
 
-            config = benchmark_configs[args.benchmark]
-            config.host = "localhost"
-            config.port = args.port
+                runner = BenchmarkRunner()
+                result = runner.run_benchmark(
+                    repo_id=repo_id,
+                    model_path=str(model_path),
+                    engine="llama-server",
+                    config=config,
+                )
 
-            # Run benchmark
-            runner = BenchmarkRunner()
-            result = runner.run_benchmark(
-                repo_id=repo_id,
-                model_path=str(model_path),
-                engine="llama-server",
-                config=config,
-            )
-
-            # Save and display results
-            results_file = runner.save_results(result)
-            runner.print_summary(result)
-
-            print("\n-- Benchmark complete!")
-            print(f"-- Results saved to: {results_file}")
+            # Step 6: Save Results
+            with tracker.step("Save Results"):
+                results_file = runner.save_results(result)
+                # Save result for final display
+                benchmark_result = result
 
         else:
-            print("\n-- Skipping benchmark as requested")
-            print(f"-- Model server running at: http://localhost:{args.port}")
-            print(
-                '-- Test with: curl -X POST http://localhost:8080/completion -H \'Content-Type: application/json\' -d \'{"prompt":"Hello","n_predict":10}\''
-            )
-
+            status_info("Skipping benchmark as requested")
+            status_info(f"Model server running at: http://localhost:{args.port}")
             if not args.no_serve:
-                input("\n-- Press Enter to stop the server...")
+                input("\nPress Enter to stop the server...")
+            benchmark_result = None
 
     except KeyboardInterrupt:
-        print("\n-- Interrupted by user")
+        status_info("Interrupted by user")
+        benchmark_result = None
 
     except Exception as e:
-        print(f"\n-- Error: {e}")
+        status_error(f"Error: {e}")
         sys.exit(1)
 
     finally:
-        # Cleanup
+        # Cleanup first
         if container and container.is_running():
-            print("\n-- Cleaning up...")
             container.stop_container()
-
-    print("\n-- Thanks for using Kepler LLM Workbench!")
+        
+        # Show workflow summary
+        tracker.print_summary()
+        
+        # Show final benchmark results at the very end
+        if 'benchmark_result' in locals() and benchmark_result:
+            print("\n")
+            runner.print_summary(benchmark_result)
 
 
 if __name__ == "__main__":

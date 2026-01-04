@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-04T17:59:07.853872",
+  "timestamp": "2026-01-04T18:16:40.711890",
   "repo_id": "local/qwen2.5-0.5b-instruct-q5_k_m",
   "model_ref": "/Users/adityapatel/Documents/kepler/models/qwen2.5-0.5b-instruct-q5_k_m.gguf",
   "engine": "llama-server",
@@ -19,44 +19,44 @@
   },
   "iterations": [
     {
-      "wall_s": 1.5078235829714686,
-      "output_text": " Quantum computing is a type of computing that uses quantum mechanics, which describes the behavior of particles at the subatomic level. In classical computing, data is stored and processed in binary form, with a 1 or a 0 at each bit. In quantum computing, data is stored and processed using quantum bits, or qubits, which can be in a superposition of states, meaning they can be both 0 and 1 at the same time. This allows quantum computers to perform many calculations simultaneously",
+      "wall_s": 1.4055864580441266,
+      "output_text": " Quantum computing is a type of computing that uses the principles of quantum mechanics to perform calculations and solve problems. It uses quantum bits or \"qubits\" instead of classical bits that can only be in two states (0 or 1). Qubits can exist in multiple states at the same time, thanks to a phenomenon called superposition. This allows quantum computers to perform many calculations in parallel, making them much faster and more powerful than classical computers. \n\nA real-world analogy is the way that quantum computers",
       "prompt_tokens": 14,
       "generated_tokens": 100,
-      "tok_per_s": 66.32075604158543,
-      "generation_tok_per_s": 72.57547123253471,
-      "ttft_ms": 122.579,
-      "prefill_ms": 122.579,
-      "generation_ms": 1377.876
+      "tok_per_s": 71.14468087516295,
+      "generation_tok_per_s": 77.03014882995055,
+      "ttft_ms": 102.486,
+      "prefill_ms": 102.486,
+      "generation_ms": 1298.193
     },
     {
-      "wall_s": 1.2454893329995684,
-      "output_text": " Quantum computing is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. The key idea is that instead of using bits (1s and 0s) that can be either on or off, quantum bits (qubits) can be in multiple states at the same time. This allows quantum computers to perform certain calculations much faster than classical computers. \n\nA real-world analogy is how a quantum computer can simulate the behavior of",
+      "wall_s": 1.1099350409931503,
+      "output_text": " Quantum computing is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. In a classical computer, data is stored as bits, which can have a value of either 0 or 1. In a quantum computer, data is stored as quantum bits, or qubits, which can be in a state of superposition (having both a 0 and a 1 at the same time) or entanglement (link",
       "prompt_tokens": 14,
       "generated_tokens": 100,
-      "tok_per_s": 80.289728181907,
-      "generation_tok_per_s": 81.58510060258756,
-      "ttft_ms": 14.865,
-      "prefill_ms": 14.865,
-      "generation_ms": 1225.714
+      "tok_per_s": 90.09536261736702,
+      "generation_tok_per_s": 91.30243841422273,
+      "ttft_ms": 9.811,
+      "prefill_ms": 9.811,
+      "generation_ms": 1095.261
     },
     {
-      "wall_s": 1.191463749972172,
-      "output_text": " Quantum computing is a type of computing that uses quantum particles, such as photons, to perform calculations. Instead of using bits (0s and 1s), which are binary digits that represent information using only two possible states, quantum computers use quantum bits, or qubits, which can be in multiple states at once. This allows quantum computers to perform certain types of computations much faster than classical computers.\nA real-world analogy to quantum computing is the way that quantum computers can solve complex problems that would be",
+      "wall_s": 1.1580891669727862,
+      "output_text": " Quantum computing is a type of computing that uses quantum mechanics to perform calculations. In classical computing, bits are represented by either a 0 or a 1, while quantum computers use quantum bits, or qubits, which can be both 0 and 1 at the same time. This allows quantum computers to perform calculations much faster than classical computers.\nA real-world analogy to quantum computing is a supercomputer that can perform complex calculations much faster than a classical computer. This is because a supercomputer uses",
       "prompt_tokens": 14,
       "generated_tokens": 100,
-      "tok_per_s": 83.930375558917,
-      "generation_tok_per_s": 85.06960394995184,
-      "ttft_ms": 11.44,
-      "prefill_ms": 11.44,
-      "generation_ms": 1175.508
+      "tok_per_s": 86.34913688157303,
+      "generation_tok_per_s": 87.56145719777068,
+      "ttft_ms": 11.648,
+      "prefill_ms": 11.648,
+      "generation_ms": 1142.055
     }
   ],
   "summary": {
-    "median_wall_s": 1.2454893329995684,
-    "median_tok_per_s": 80.289728181907,
-    "median_ttft_ms": 14.865,
-    "median_generation_tok_per_s": 81.58510060258756
+    "median_wall_s": 1.1580891669727862,
+    "median_tok_per_s": 86.34913688157303,
+    "median_ttft_ms": 11.648,
+    "median_generation_tok_per_s": 87.56145719777068
   },
   "mode": "text-only",
   "environment": "stable"
