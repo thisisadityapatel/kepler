@@ -2,13 +2,14 @@
 
 import json
 import platform
+import yaml
 from pathlib import Path
 from typing import List
 from dataclasses import dataclass, asdict
 from datetime import datetime
 
 from run_bench import bench_once_llama
-from common import PERF_ROOT
+from common import PERF_ROOT, CONFIG_PATH
 
 
 @dataclass
@@ -89,6 +90,26 @@ class BenchmarkRunner:
         self.results_dir = results_dir or PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
+    def run_multiple_benchmarks(
+        self,
+        repo_id: str,
+        model_path: str,
+        engine: str = "llama-server",
+        configs: List[BenchmarkConfig] = None,
+    ) -> List[ModelBenchmarkResult]:
+        """Run multiple benchmark configurations."""
+        if not configs:
+            return []
+        
+        results = []
+        for config in configs:
+            try:
+                result = self.run_benchmark(repo_id, model_path, engine, config)
+                results.append(result)
+            except Exception:
+                continue
+        return results
+
     def run_benchmark(
         self,
         repo_id: str,
@@ -106,17 +127,9 @@ class BenchmarkRunner:
                 iterations=3,
             )
 
-        print(f"-- Starting benchmark for {repo_id}")
-        print(f"-- Engine: {engine}")
-        print(f"-- Prompt: {config.prompt[:50]}...")
-        print(f"-- Iterations: {config.iterations}")
-
         iterations = []
 
-        # Run benchmark iterations
         for i in range(config.iterations):
-            print(f"-- Run {i + 1}/{config.iterations}", end=" ")
-
             try:
                 result = bench_once_llama(
                     prompt=config.prompt,
@@ -134,15 +147,12 @@ class BenchmarkRunner:
                     tok_per_s=result["tok_per_s"],
                     generation_tok_per_s=result["generation_tok_per_s"],
                     ttft_ms=result["ttft_ms"],
-                    prefill_ms=result["ttft_ms"],  # Use TTFT as prefill for now
+                    prefill_ms=result["ttft_ms"],
                     generation_ms=result["generation_ms"],
                 )
 
                 iterations.append(iteration)
-                print(f"-- {result['tok_per_s']:.1f} tok/s")
-
-            except Exception as e:
-                print(f"-- Failed: {e}")
+            except Exception:
                 continue
 
         if not iterations:
@@ -202,7 +212,6 @@ class BenchmarkRunner:
         with open(file_path, "w") as f:
             json.dump(data, f, indent=2)
 
-        print(f"-- Results saved to: {file_path}")
         return file_path
 
     def print_summary(self, result: ModelBenchmarkResult):
@@ -229,6 +238,34 @@ class BenchmarkRunner:
         print("=" * 60)
 
 
+def load_benchmark_questions():
+    """Load benchmark questions from config file."""
+    try:
+        with open(CONFIG_PATH, 'r') as f:
+            config = yaml.safe_load(f)
+        return config.get('benchmark_questions', {}).get('hard_questions', [])
+    except Exception:
+        return []
+
+
+def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
+    """Create benchmark configs from hard questions in config file."""
+    questions = load_benchmark_questions()
+    benchmarks = []
+    
+    for i, q in enumerate(questions, 1):
+        config = BenchmarkConfig(
+            prompt_set=f"hard_question_{i}",
+            prompt=q["prompt"],
+            max_tokens=q["max_tokens"],
+            temperature=0.7,
+            iterations=3,
+        )
+        benchmarks.append(config)
+    
+    return benchmarks
+
+
 # Default benchmark configurations
 QUICK_BENCHMARK = BenchmarkConfig(
     prompt_set="quick",
@@ -253,3 +290,5 @@ PERFORMANCE_BENCHMARK = BenchmarkConfig(
     temperature=0.7,
     iterations=5,
 )
+
+HARD_QUESTIONS_BENCHMARK = create_hard_questions_benchmark()

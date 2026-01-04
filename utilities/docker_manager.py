@@ -91,151 +91,66 @@ class DockerContainer:
 
     def build_image(self, dockerfile_path: Path, version: str) -> bool:
         """Build Docker image if it doesn't exist."""
-        # Check if image exists
         check_cmd = ["docker", "images", "-q", f"{self.image}:{version}"]
         result = subprocess.run(check_cmd, capture_output=True, text=True)
 
         if result.stdout.strip():
-            print(f"-- Docker image {self.image}:{version} already exists")
             return True
 
-        print(f"-- Building Docker image {self.image}:{version}...")
         build_cmd = [
-            "docker",
-            "build",
-            "-f",
-            str(dockerfile_path),
-            "--build-arg",
-            f"VERSION={version}",
-            "-t",
-            f"{self.image}:{version}",
-            ".",
+            "docker", "build", "-f", str(dockerfile_path),
+            "--build-arg", f"VERSION={version}",
+            "-t", f"{self.image}:{version}", "."
         ]
 
-        print(f"-- Running command: {' '.join(build_cmd)}")
-
         try:
-            process = subprocess.Popen(
-                build_cmd,
-                cwd=dockerfile_path.parent.parent,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-                universal_newlines=True,
-            )
-
-            # Stream output in real-time
-            while True:
-                output = process.stdout.readline()
-                if output == "" and process.poll() is not None:
-                    break
-                if output:
-                    print(output.strip())
-
-            # Wait for completion
-            return_code = process.wait(timeout=600)
-
-            if return_code == 0:
-                print(f"-- Successfully built {self.image}:{version}")
-                return True
-            else:
-                print(f"-- Failed to build image with return code: {return_code}")
-                return False
-
+            result = subprocess.run(build_cmd, cwd=dockerfile_path.parent.parent, 
+                                  capture_output=True, text=True, timeout=600)
+            return result.returncode == 0
         except subprocess.TimeoutExpired:
-            print("-- Docker build timed out after 10 minutes")
-            if "process" in locals():
-                process.kill()
             return False
-        except Exception as e:
-            print(f"-- Error building Docker image: {e}")
+        except Exception:
             return False
 
     def start_container(self, docker_cmd: list[str]) -> bool:
         """Start the Docker container."""
-        print(f"-- Starting container with command: {' '.join(docker_cmd)}")
-
         try:
             self.process = subprocess.Popen(
                 docker_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
             )
-
-            # Give it a moment to start
             time.sleep(2)
-
-            # Check if process is still running
-            if self.process.poll() is None:
-                print(f"-- Container started successfully on port {self.port}")
-                return True
-            else:
-                stdout, stderr = self.process.communicate()
-                print("-- Container failed to start:")
-                if stdout:
-                    print(f"Output: {stdout}")
-                if stderr:
-                    print(f"Errors: {stderr}")
-                return False
-
-        except Exception as e:
-            print(f"-- Error starting container: {e}")
+            return self.process.poll() is None
+        except Exception:
             return False
 
     def wait_for_ready(self, timeout: int = 60) -> bool:
         """Wait for the model server to be ready."""
-        print(f"-- Waiting for model server to be ready on port {self.port}...")
-
         start_time = time.time()
         while time.time() - start_time < timeout:
-            try:
-                # Try to connect to the health endpoint or completion endpoint
-                health_url = f"http://localhost:{self.port}/health"
-                response = requests.get(health_url, timeout=5)
-                if response.status_code == 200:
-                    print("-- Model server is ready!")
-                    return True
-            except requests.exceptions.RequestException:
-                pass
-
-            # If health endpoint doesn't exist, try completion endpoint
             try:
                 completion_url = f"http://localhost:{self.port}/completion"
                 test_payload = {"prompt": "test", "n_predict": 1}
                 response = requests.post(completion_url, json=test_payload, timeout=5)
-                if response.status_code in [
-                    200,
-                    400,
-                ]:  # 400 is OK, means server is responding
-                    print("-- Model server is ready!")
+                if response.status_code in [200, 400]:
                     return True
             except requests.exceptions.RequestException:
                 pass
-
-            print(".", end="", flush=True)
             time.sleep(2)
-
-        print(f"\n-- Model server did not become ready within {timeout} seconds")
         return False
 
     def stop_container(self) -> bool:
         """Stop the running container."""
         if self.process:
-            print("-- Stopping container...")
             try:
                 self.process.terminate()
-                # Wait up to 10 seconds for graceful shutdown
                 try:
                     self.process.wait(timeout=10)
                 except subprocess.TimeoutExpired:
-                    print("-- Force killing container...")
                     self.process.kill()
                     self.process.wait()
-
-                print("-- Container stopped")
                 self.process = None
                 return True
-            except Exception as e:
-                print(f"-- Error stopping container: {e}")
+            except Exception:
                 return False
         return True
 

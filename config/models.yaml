@@ -9,6 +9,21 @@ defaults:
       args:
         n_gpu_layers: 999
 
+# Benchmark questions for comprehensive LLM evaluation
+benchmark_questions:
+  hard_questions:
+    - prompt: "Analyze the philosophical implications of consciousness transfer in AI systems. How would uploading human consciousness to a digital substrate affect personal identity, continuity of self, and the nature of existence? Consider both materialist and dualist perspectives, and address the hard problem of consciousness in your analysis."
+      max_tokens: 300
+      description: "Complex philosophical reasoning and consciousness theory"
+    
+    - prompt: "Design a comprehensive solution for a distributed quantum computing network that can handle fault-tolerant quantum error correction across multiple geographic locations. Address the challenges of quantum decoherence, entanglement distribution, classical-quantum interfaces, and the economic implications of such a system. Include specific protocols and algorithms."
+      max_tokens: 350
+      description: "Advanced technical problem-solving in quantum computing"
+    
+    - prompt: "Construct a detailed mathematical proof that demonstrates why P vs NP is such a fundamental question in computational complexity theory. Then, propose a novel approach to tackling this problem by examining the relationship between circuit complexity, proof complexity, and algebraic geometry. Support your approach with rigorous mathematical reasoning."
+      max_tokens: 400
+      description: "Advanced mathematics and theoretical computer science"
+
 models:
   - repo_id: unsloth/qwen2.5
     include:

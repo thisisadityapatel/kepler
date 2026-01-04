@@ -17,6 +17,7 @@ from benchmark import (
     PERFORMANCE_BENCHMARK,
     QUICK_BENCHMARK,
     STANDARD_BENCHMARK,
+    HARD_QUESTIONS_BENCHMARK,
     BenchmarkRunner,
 )
 from docker_manager import create_llama_container
@@ -51,7 +52,7 @@ Examples:
     parser.add_argument(
         "--benchmark",
         "-b",
-        choices=["quick", "standard", "performance", "skip"],
+        choices=["quick", "standard", "performance", "hard", "skip"],
         default="standard",
         help="Benchmark type to run (default: standard)",
     )
@@ -148,28 +149,51 @@ Examples:
         if args.benchmark != "skip":
             with tracker.step("Benchmarking"):
                 benchmark_configs = {
-                    "quick": QUICK_BENCHMARK,
-                    "standard": STANDARD_BENCHMARK,
-                    "performance": PERFORMANCE_BENCHMARK,
+                    "quick": [QUICK_BENCHMARK],
+                    "standard": [STANDARD_BENCHMARK],
+                    "performance": [PERFORMANCE_BENCHMARK],
+                    "hard": HARD_QUESTIONS_BENCHMARK,
                 }
 
-                config = benchmark_configs[args.benchmark]
-                config.host = "localhost"
-                config.port = args.port
+                configs = benchmark_configs[args.benchmark]
+                
+                # Set host/port for all configs
+                for config in configs:
+                    config.host = "localhost"
+                    config.port = args.port
 
                 runner = BenchmarkRunner()
-                result = runner.run_benchmark(
-                    repo_id=repo_id,
-                    model_path=str(model_path),
-                    engine="llama-server",
-                    config=config,
-                )
+                
+                if args.benchmark == "hard":
+                    # Run multiple benchmarks for hard questions
+                    results = runner.run_multiple_benchmarks(
+                        repo_id=repo_id,
+                        model_path=str(model_path),
+                        engine="llama-server",
+                        configs=configs,
+                    )
+                    benchmark_result = results  # List of results
+                else:
+                    # Single benchmark for other types
+                    result = runner.run_benchmark(
+                        repo_id=repo_id,
+                        model_path=str(model_path),
+                        engine="llama-server",
+                        config=configs[0],
+                    )
+                    benchmark_result = result  # Single result
 
             # Step 6: Save Results
             with tracker.step("Save Results"):
-                results_file = runner.save_results(result)
-                # Save result for final display
-                benchmark_result = result
+                if isinstance(benchmark_result, list):
+                    # Save multiple results
+                    results_files = []
+                    for result in benchmark_result:
+                        results_file = runner.save_results(result)
+                        results_files.append(results_file)
+                else:
+                    # Save single result
+                    results_file = runner.save_results(benchmark_result)
 
         else:
             status_info("Skipping benchmark as requested")
@@ -197,7 +221,14 @@ Examples:
         # Show final benchmark results at the very end
         if 'benchmark_result' in locals() and benchmark_result:
             print("\n")
-            runner.print_summary(benchmark_result)
+            if isinstance(benchmark_result, list):
+                # Print summary for each hard question result
+                for i, result in enumerate(benchmark_result, 1):
+                    print(f"\n📋 Hard Question {i} Results:")
+                    runner.print_summary(result)
+            else:
+                # Single result
+                runner.print_summary(benchmark_result)
 
 
 if __name__ == "__main__":
