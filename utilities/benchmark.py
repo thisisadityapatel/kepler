@@ -19,7 +19,7 @@ class BenchmarkConfig:
     prompt_set: str
     prompt: str
     max_tokens: int = 100
-    temperature: float = 0.7
+    temperature: float = 0
     iterations: int = 3
     host: str = "localhost"
     port: int = 8080
@@ -90,46 +90,18 @@ class BenchmarkRunner:
         self.results_dir = PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
-    def run_multiple_benchmarks(
-        self,
-        repo_id: str,
-        model_path: str,
-        engine: str = "llama-server",
-        configs: List[BenchmarkConfig] = None,
-    ) -> List[ModelBenchmarkResult]:
-        """Run multiple benchmark configurations."""
-        if not configs:
-            return []
-
-        results = []
-        for config in configs:
-            try:
-                result = self.run_benchmark(repo_id, model_path, engine, config)
-                results.append(result)
-            except Exception:
-                continue
-        return results
-
     def run_benchmark(
         self,
         repo_id: str,
         model_path: str,
+        config: BenchmarkConfig,
         engine: str = "llama-server",
-        config: BenchmarkConfig = None,
     ) -> ModelBenchmarkResult:
         """Run complete benchmark for a model."""
-        if config is None:
-            config = BenchmarkConfig(
-                prompt_set="default",
-                prompt="Explain quantum computing to a 10-year-old.",
-                max_tokens=100,
-                temperature=0.7,
-                iterations=3,
-            )
 
         iterations = []
 
-        for i in range(config.iterations):
+        for _ in range(config.iterations):
             try:
                 result = bench_once_llama(
                     prompt=config.prompt,
@@ -224,16 +196,16 @@ class BenchmarkRunner:
         print(f"Timestamp: {result.timestamp}")
         print(f"Iterations: {len(result.iterations)}")
 
-        print("\n🚀 Performance Metrics (Median):")
-        print(f"   Tokens/sec:     {result.summary.median_tok_per_s:.2f}")
-        print(f"   TTFT (ms):      {result.summary.median_ttft_ms:.1f}")
-        print(f"   Wall Time:      {result.summary.median_wall_s:.2f}s")
-        print(f"   Gen Tokens/sec: {result.summary.median_generation_tok_per_s:.2f}")
+        print("\nPerformance Metrics (Median):")
+        print(f"  Tokens/sec:     {result.summary.median_tok_per_s:.2f}")
+        print(f"  TTFT (ms):      {result.summary.median_ttft_ms:.1f}")
+        print(f"  Wall Time:      {result.summary.median_wall_s:.2f}s")
+        print(f"  Gen Tokens/sec: {result.summary.median_generation_tok_per_s:.2f}")
 
-        print("\n💻 System Info:")
-        print(f"   Platform:       {result.system_info.platform}")
-        print(f"   Architecture:   {result.system_info.architecture}")
-        print(f"   Processor:      {result.system_info.processor}")
+        print("\nSystem Info:")
+        print(f"  Platform:       {result.system_info.platform}")
+        print(f"  Architecture:   {result.system_info.architecture}")
+        print(f"  Processor:      {result.system_info.processor}")
 
         print("=" * 60)
 
