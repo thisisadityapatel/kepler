@@ -14,10 +14,10 @@ import sys
 from pathlib import Path
 
 from benchmark import (
+    HARD_QUESTIONS_BENCHMARK,
     PERFORMANCE_BENCHMARK,
     QUICK_BENCHMARK,
     STANDARD_BENCHMARK,
-    HARD_QUESTIONS_BENCHMARK,
     BenchmarkRunner,
 )
 from docker_manager import create_llama_container

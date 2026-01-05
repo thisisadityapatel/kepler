@@ -86,8 +86,8 @@ class ModelBenchmarkResult:
 class BenchmarkRunner:
     """Runs comprehensive benchmarks on LLM models."""
 
-    def __init__(self, results_dir: Path):
-        self.results_dir = results_dir or PERF_ROOT
+    def __init__(self):
+        self.results_dir = PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
     def run_multiple_benchmarks(
