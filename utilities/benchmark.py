@@ -2,14 +2,14 @@
 
 import json
 import platform
-import yaml
+from dataclasses import asdict, dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import List
-from dataclasses import dataclass, asdict
-from datetime import datetime
 
+import yaml
+from common import CONFIG_PATH, PERF_ROOT
 from run_bench import bench_once_llama
-from common import PERF_ROOT, CONFIG_PATH
 
 
 @dataclass
@@ -86,7 +86,7 @@ class ModelBenchmarkResult:
 class BenchmarkRunner:
     """Runs comprehensive benchmarks on LLM models."""
 
-    def __init__(self, results_dir: Path = None):
+    def __init__(self, results_dir: Path):
         self.results_dir = results_dir or PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -100,7 +100,7 @@ class BenchmarkRunner:
         """Run multiple benchmark configurations."""
         if not configs:
             return []
-        
+
         results = []
         for config in configs:
             try:
@@ -241,9 +241,9 @@ class BenchmarkRunner:
 def load_benchmark_questions():
     """Load benchmark questions from config file."""
     try:
-        with open(CONFIG_PATH, 'r') as f:
+        with open(CONFIG_PATH, "r") as f:
             config = yaml.safe_load(f)
-        return config.get('benchmark_questions', {}).get('hard_questions', [])
+        return config.get("benchmark_questions", {}).get("hard_questions", [])
     except Exception:
         return []
 
@@ -252,7 +252,7 @@ def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
     """Create benchmark configs from hard questions in config file."""
     questions = load_benchmark_questions()
     benchmarks = []
-    
+
     for i, q in enumerate(questions, 1):
         config = BenchmarkConfig(
             prompt_set=f"hard_question_{i}",
@@ -262,7 +262,7 @@ def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
             iterations=3,
         )
         benchmarks.append(config)
-    
+
     return benchmarks
 
 

@@ -98,14 +98,25 @@ class DockerContainer:
             return True
 
         build_cmd = [
-            "docker", "build", "-f", str(dockerfile_path),
-            "--build-arg", f"VERSION={version}",
-            "-t", f"{self.image}:{version}", "."
+            "docker",
+            "build",
+            "-f",
+            str(dockerfile_path),
+            "--build-arg",
+            f"VERSION={version}",
+            "-t",
+            f"{self.image}:{version}",
+            ".",
         ]
 
         try:
-            result = subprocess.run(build_cmd, cwd=dockerfile_path.parent.parent, 
-                                  capture_output=True, text=True, timeout=600)
+            result = subprocess.run(
+                build_cmd,
+                cwd=dockerfile_path.parent.parent,
+                capture_output=True,
+                text=True,
+                timeout=600,
+            )
             return result.returncode == 0
         except subprocess.TimeoutExpired:
             return False

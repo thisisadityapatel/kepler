@@ -133,7 +133,7 @@ Examples:
             print("3. Performance (5 iterations, comprehensive)")
             print("4. Hard Questions (3 challenging questions, 3 iterations each)")
             print("5. Skip benchmarking")
-            
+
             while True:
                 try:
                     choice = input("\nSelect benchmark (1-5): ").strip()
@@ -191,14 +191,14 @@ Examples:
                 }
 
                 configs = benchmark_configs[selected_benchmark]
-                
+
                 # Set host/port for all configs
                 for config in configs:
                     config.host = "localhost"
                     config.port = args.port
 
                 runner = BenchmarkRunner()
-                
+
                 if selected_benchmark == "hard":
                     # Run multiple benchmarks for hard questions
                     results = runner.run_multiple_benchmarks(
@@ -249,12 +249,12 @@ Examples:
         # Cleanup first
         if container and container.is_running():
             container.stop_container()
-        
+
         # Show workflow summary
         tracker.print_summary()
-        
+
         # Show final benchmark results at the very end
-        if 'benchmark_result' in locals() and benchmark_result:
+        if "benchmark_result" in locals() and benchmark_result:
             print("\n")
             if isinstance(benchmark_result, list):
                 # Print summary for each hard question result
