@@ -6,11 +6,8 @@ from typing import List, Optional
 from common import ROOT
 
 
-def find_gguf_models(models_dir: Path = None) -> List[Path]:
+def find_gguf_models(models_dir: Path = ROOT / "models") -> List[Path]:
     """Find all .gguf model files in the models directory."""
-    if models_dir is None:
-        models_dir = ROOT / "models"
-
     if not models_dir.exists():
         return []
 
@@ -79,8 +76,6 @@ def get_user_selection(models: List[Path]) -> Optional[Path]:
 
 def select_model_interactive() -> Optional[Path]:
     """Main interactive model selection function."""
-    print("🚀 Kepler LLM Workbench - Model Selection")
-
     models = find_gguf_models()
     display_models(models)
 
@@ -90,10 +85,9 @@ def select_model_interactive() -> Optional[Path]:
     selected_model = get_user_selection(models)
 
     if selected_model:
-        print(f"\n✅ Selected: {selected_model.name}")
+        print(f"\n✅ Selected: {selected_model.name}\n")
         return selected_model
     else:
-        print("\n👋 No model selected. Goodbye!")
         return None
 
 

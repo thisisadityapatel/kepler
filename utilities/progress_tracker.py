@@ -1,11 +1,12 @@
 """Progress tracking system using Rich for Kepler LLM Workbench."""
 
+import time
+from contextlib import contextmanager
+from typing import Dict, List
+
 from rich.console import Console
 from rich.status import Status
 from rich.table import Table
-import time
-from typing import List, Dict
-from contextlib import contextmanager
 
 
 class WorkflowTracker:
@@ -99,7 +100,7 @@ class WorkflowTracker:
         finally:
             # Refresh display
             self.console.clear()
-            self.console.print("[bold]Kepler LLM Workbench[/bold]")
+            self.console.print("\n[bold]Kepler LLM Workbench[/bold]")
             self.console.print()
             self.show_workflow()
 
@@ -137,7 +138,9 @@ def create_workbench_tracker() -> WorkflowTracker:
     tracker.add_step("Container Start", "Start model server")
     tracker.add_step("Health Check", "Wait for server ready")
     tracker.add_step("Benchmarking", "Run performance tests")
-    tracker.add_step("Save Results", "Save benchmark data")
+    tracker.add_step(
+        "Save Results", "Save benchmark results to disk"
+    )
     return tracker
 
 

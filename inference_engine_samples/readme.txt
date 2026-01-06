@@ -1,5 +1,10 @@
 Inference Engines
 
+llama.cpp
+  Speed: Moderate
+  Hardware Needs: CPU/Any GPU
+  Best Use Case: Local, personal use
+
 vLLM
   Speed: Very Fast
   Hardware Needs: High-end GPU
@@ -9,11 +14,6 @@ TensorRT-LLM
   Speed: Fastest
   Hardware Needs: NVIDIA GPU (required)
   Best Use Case: Production, max performance
-
-llama.cpp
-  Speed: Moderate
-  Hardware Needs: CPU/Any GPU
-  Best Use Case: Local, personal use
 
 ik_llama.cpp
   Speed: Moderate-Fast

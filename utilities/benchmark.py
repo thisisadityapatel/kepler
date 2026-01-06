@@ -19,7 +19,7 @@ class BenchmarkConfig:
     prompt_set: str
     prompt: str
     max_tokens: int = 100
-    temperature: float = 0
+    temperature: float = 0.7
     iterations: int = 3
     host: str = "localhost"
     port: int = 8080
@@ -90,12 +90,32 @@ class BenchmarkRunner:
         self.results_dir = PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
+    def run_multiple_benchmarks(
+        self,
+        repo_id: str,
+        model_path: str,
+        engine: str = "llama-server",
+        configs: List[BenchmarkConfig] = [],
+    ) -> List[ModelBenchmarkResult]:
+        """Run multiple benchmark configurations."""
+        if not configs:
+            return []
+
+        results = []
+        for config in configs:
+            try:
+                result = self.run_benchmark(repo_id, model_path, config, engine)
+                results.append(result)
+            except Exception:
+                continue
+        return results
+
     def run_benchmark(
         self,
         repo_id: str,
         model_path: str,
         config: BenchmarkConfig,
-        engine: str = "llama-server",
+        engine: str = "llama-server",  # Default to llama-server
     ) -> ModelBenchmarkResult:
         """Run complete benchmark for a model."""
 
@@ -206,18 +226,41 @@ class BenchmarkRunner:
         print(f"  Platform:       {result.system_info.platform}")
         print(f"  Architecture:   {result.system_info.architecture}")
         print(f"  Processor:      {result.system_info.processor}")
-
         print("=" * 60)
+
+
+def load_config():
+    """Load full config from YAML file."""
+    try:
+        with open(CONFIG_PATH, "r") as f:
+            return yaml.safe_load(f)
+    except Exception:
+        return {}
 
 
 def load_benchmark_questions():
     """Load benchmark questions from config file."""
-    try:
-        with open(CONFIG_PATH, "r") as f:
-            config = yaml.safe_load(f)
-        return config.get("benchmark_questions", {}).get("hard_questions", [])
-    except Exception:
-        return []
+    config = load_config()
+    return config.get("benchmark_questions", {}).get("hard_questions", [])
+
+
+def load_benchmark_config(benchmark_name: str) -> BenchmarkConfig:
+    """Load a specific benchmark configuration from config file."""
+    config = load_config()
+    benchmark_data = config.get(benchmark_name, {})
+
+    if not benchmark_data:
+        raise ValueError(f"Benchmark '{benchmark_name}' not found in config")
+
+    return BenchmarkConfig(
+        prompt_set=benchmark_data.get("prompt_set", benchmark_name),
+        prompt=benchmark_data["prompt"],
+        max_tokens=benchmark_data.get("max_tokens", 100),
+        temperature=benchmark_data.get("temperature", 0.7),
+        iterations=benchmark_data.get("iterations", 3),
+        host=benchmark_data.get("host", "localhost"),
+        port=benchmark_data.get("port", 8080),
+    )
 
 
 def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
@@ -238,29 +281,8 @@ def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
     return benchmarks
 
 
-# Default benchmark configurations
-QUICK_BENCHMARK = BenchmarkConfig(
-    prompt_set="quick",
-    prompt="Write a short Python function to find the maximum number in a list.",
-    max_tokens=50,
-    temperature=0.7,
-    iterations=2,
-)
-
-STANDARD_BENCHMARK = BenchmarkConfig(
-    prompt_set="standard",
-    prompt="Explain quantum computing in simple terms and provide a real-world analogy.",
-    max_tokens=100,
-    temperature=0.7,
-    iterations=3,
-)
-
-PERFORMANCE_BENCHMARK = BenchmarkConfig(
-    prompt_set="performance",
-    prompt="Write a comprehensive guide on machine learning algorithms, including examples and use cases for each type.",
-    max_tokens=200,
-    temperature=0.7,
-    iterations=5,
-)
-
+# Load benchmark configurations from config file
+QUICK_BENCHMARK = load_benchmark_config("quick_benchmark")
+STANDARD_BENCHMARK = load_benchmark_config("standard_benchmark")
+PERFORMANCE_BENCHMARK = load_benchmark_config("performance_benchmark")
 HARD_QUESTIONS_BENCHMARK = create_hard_questions_benchmark()

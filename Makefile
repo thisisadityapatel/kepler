@@ -6,9 +6,12 @@ help:
 	@echo "  make test       - Run unit tests with pytest"
 	@echo "  make lint       - Run and fix linting checks with ruff"
 	@echo "  make hf_cache   - Hugging face locally downloaded models data"
+	@echo "  make run        - Run Project"
 
 install:
-	uv sync
+	uv venv && \
+	source .venv/bin/activate && \
+	uv sync && \
 	uv pip install -r requirements.txt
 
 test:
@@ -26,3 +29,6 @@ hf_cache:
 	@du -sh ~/.cache/huggingface/hub/models--* 2>/dev/null || echo "No models cached"
 	@echo "\nAll Cached Items:"
 	@ls -lh ~/.cache/huggingface/hub/ 2>/dev/null || echo "Cache directory not found"
+
+make run:
+	uv run python utilities/workbench.py
