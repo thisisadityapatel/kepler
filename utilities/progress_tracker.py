@@ -138,9 +138,7 @@ def create_workbench_tracker() -> WorkflowTracker:
     tracker.add_step("Container Start", "Start model server")
     tracker.add_step("Health Check", "Wait for server ready")
     tracker.add_step("Benchmarking", "Run performance tests")
-    tracker.add_step(
-        "Save Results", "Save benchmark results to disk"
-    )
+    tracker.add_step("Save Results", "Save benchmark results to disk")
     return tracker
 
 
