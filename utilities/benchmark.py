@@ -86,8 +86,8 @@ class ModelBenchmarkResult:
 class BenchmarkRunner:
     """Runs comprehensive benchmarks on LLM models."""
 
-    def __init__(self, results_dir: Path):
-        self.results_dir = results_dir or PERF_ROOT
+    def __init__(self):
+        self.results_dir = PERF_ROOT
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
     def run_multiple_benchmarks(
@@ -95,7 +95,7 @@ class BenchmarkRunner:
         repo_id: str,
         model_path: str,
         engine: str = "llama-server",
-        configs: List[BenchmarkConfig] = None,
+        configs: List[BenchmarkConfig] = [],
     ) -> List[ModelBenchmarkResult]:
         """Run multiple benchmark configurations."""
         if not configs:
@@ -104,7 +104,7 @@ class BenchmarkRunner:
         results = []
         for config in configs:
             try:
-                result = self.run_benchmark(repo_id, model_path, engine, config)
+                result = self.run_benchmark(repo_id, model_path, config, engine)
                 results.append(result)
             except Exception:
                 continue
@@ -114,22 +114,14 @@ class BenchmarkRunner:
         self,
         repo_id: str,
         model_path: str,
-        engine: str = "llama-server",
-        config: BenchmarkConfig = None,
+        config: BenchmarkConfig,
+        engine: str = "llama-server",  # Default to llama-server
     ) -> ModelBenchmarkResult:
         """Run complete benchmark for a model."""
-        if config is None:
-            config = BenchmarkConfig(
-                prompt_set="default",
-                prompt="Explain quantum computing to a 10-year-old.",
-                max_tokens=100,
-                temperature=0.7,
-                iterations=3,
-            )
 
         iterations = []
 
-        for i in range(config.iterations):
+        for _ in range(config.iterations):
             try:
                 result = bench_once_llama(
                     prompt=config.prompt,
@@ -224,28 +216,51 @@ class BenchmarkRunner:
         print(f"Timestamp: {result.timestamp}")
         print(f"Iterations: {len(result.iterations)}")
 
-        print("\n🚀 Performance Metrics (Median):")
-        print(f"   Tokens/sec:     {result.summary.median_tok_per_s:.2f}")
-        print(f"   TTFT (ms):      {result.summary.median_ttft_ms:.1f}")
-        print(f"   Wall Time:      {result.summary.median_wall_s:.2f}s")
-        print(f"   Gen Tokens/sec: {result.summary.median_generation_tok_per_s:.2f}")
+        print("\nPerformance Metrics (Median):")
+        print(f"  Tokens/sec:     {result.summary.median_tok_per_s:.2f}")
+        print(f"  TTFT (ms):      {result.summary.median_ttft_ms:.1f}")
+        print(f"  Wall Time:      {result.summary.median_wall_s:.2f}s")
+        print(f"  Gen Tokens/sec: {result.summary.median_generation_tok_per_s:.2f}")
 
-        print("\n💻 System Info:")
-        print(f"   Platform:       {result.system_info.platform}")
-        print(f"   Architecture:   {result.system_info.architecture}")
-        print(f"   Processor:      {result.system_info.processor}")
-
+        print("\nSystem Info:")
+        print(f"  Platform:       {result.system_info.platform}")
+        print(f"  Architecture:   {result.system_info.architecture}")
+        print(f"  Processor:      {result.system_info.processor}")
         print("=" * 60)
+
+
+def load_config():
+    """Load full config from YAML file."""
+    try:
+        with open(CONFIG_PATH, "r") as f:
+            return yaml.safe_load(f)
+    except Exception:
+        return {}
 
 
 def load_benchmark_questions():
     """Load benchmark questions from config file."""
-    try:
-        with open(CONFIG_PATH, "r") as f:
-            config = yaml.safe_load(f)
-        return config.get("benchmark_questions", {}).get("hard_questions", [])
-    except Exception:
-        return []
+    config = load_config()
+    return config.get("benchmark_questions", {}).get("hard_questions", [])
+
+
+def load_benchmark_config(benchmark_name: str) -> BenchmarkConfig:
+    """Load a specific benchmark configuration from config file."""
+    config = load_config()
+    benchmark_data = config.get(benchmark_name, {})
+
+    if not benchmark_data:
+        raise ValueError(f"Benchmark '{benchmark_name}' not found in config")
+
+    return BenchmarkConfig(
+        prompt_set=benchmark_data.get("prompt_set", benchmark_name),
+        prompt=benchmark_data["prompt"],
+        max_tokens=benchmark_data.get("max_tokens", 100),
+        temperature=benchmark_data.get("temperature", 0.7),
+        iterations=benchmark_data.get("iterations", 3),
+        host=benchmark_data.get("host", "localhost"),
+        port=benchmark_data.get("port", 8080),
+    )
 
 
 def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
@@ -266,29 +281,8 @@ def create_hard_questions_benchmark() -> List[BenchmarkConfig]:
     return benchmarks
 
 
-# Default benchmark configurations
-QUICK_BENCHMARK = BenchmarkConfig(
-    prompt_set="quick",
-    prompt="Write a short Python function to find the maximum number in a list.",
-    max_tokens=50,
-    temperature=0.7,
-    iterations=2,
-)
-
-STANDARD_BENCHMARK = BenchmarkConfig(
-    prompt_set="standard",
-    prompt="Explain quantum computing in simple terms and provide a real-world analogy.",
-    max_tokens=100,
-    temperature=0.7,
-    iterations=3,
-)
-
-PERFORMANCE_BENCHMARK = BenchmarkConfig(
-    prompt_set="performance",
-    prompt="Write a comprehensive guide on machine learning algorithms, including examples and use cases for each type.",
-    max_tokens=200,
-    temperature=0.7,
-    iterations=5,
-)
-
+# Load benchmark configurations from config file
+QUICK_BENCHMARK = load_benchmark_config("quick_benchmark")
+STANDARD_BENCHMARK = load_benchmark_config("standard_benchmark")
+PERFORMANCE_BENCHMARK = load_benchmark_config("performance_benchmark")
 HARD_QUESTIONS_BENCHMARK = create_hard_questions_benchmark()
