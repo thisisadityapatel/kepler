@@ -13,11 +13,11 @@ make install
 Interactive mode: select model and benchmark.
 
 ```bash
-python utilities/workbench.py
+uv run python utilities/workbench.py
 ```
 
 Direct mode with specific model and benchmark preset (quick, standard, performance, hard).
 
 ```bash
-python utilities/workbench.py --model path/to/model.gguf --benchmark quick
+uv run python utilities/workbench.py --model path/to/model.gguf --benchmark quick
 ```
