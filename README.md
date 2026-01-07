@@ -1,6 +1,6 @@
 # Kepler
 
-LLM benchmarking workbench for macOS. Select, serve, and benchmark GGUF models via llama.cpp in Docker.
+LLM benchmarking workbench for macOS. Select, serve, and benchmark models (GGUF) via llama.cpp in Docker.
 
 ## Setup
 
@@ -13,7 +13,7 @@ make install
 Interactive mode: select model and benchmark.
 
 ```bash
-uv run python utilities/workbench.py
+make run
 ```
 
 Direct mode with specific model and benchmark preset (quick, standard, performance, hard).
