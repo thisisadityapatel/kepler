@@ -1,4 +1,4 @@
-.PHONY: help install test lint
+.PHONY: help install test lint hf_cache run
 
 help:
 	@echo "Available commands:"
