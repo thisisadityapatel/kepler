@@ -31,4 +31,5 @@ hf_cache:
 	@ls -lh ~/.cache/huggingface/hub/ 2>/dev/null || echo "Cache directory not found"
 
 make run:
+	source .venv/bin/activate && \
 	uv run python utilities/workbench.py
