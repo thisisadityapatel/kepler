@@ -1,6 +1,6 @@
 # Kepler
 
-LLM workbench for macOS. Select, serve, and benchmark models (GGUF) via llama.cpp in Docker.
+Personal LLM workbench for macOS. Select, serve, and benchmark models (GGUF) via llama.cpp in Docker.
 
 ## Setup
 
