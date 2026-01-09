@@ -10,7 +10,7 @@ make install
 
 ## Run
 
-Download the desired .gguf model into the `models` directory. ([Instructions](https://github.com/thisisadityapatel/kepler/blob/main/models/readme.md))
+Download .gguf model into the `models` directory. ([Instructions](https://github.com/thisisadityapatel/kepler/blob/main/models/readme.md))
 
 Then run:
 

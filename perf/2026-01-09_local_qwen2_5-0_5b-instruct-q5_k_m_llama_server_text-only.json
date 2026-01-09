@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-01-09T11:31:59.565330",
+  "repo_id": "local/qwen2.5-0.5b-instruct-q5_k_m",
+  "model_ref": "/Users/adityapatel/Documents/kepler/models/qwen2.5-0.5b-instruct-q5_k_m.gguf",
+  "engine": "llama-server",
+  "system_info": {
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "processor": "arm"
+  },
+  "config": {
+    "prompt_set": "performance",
+    "prompt": "Write a comprehensive guide on machine learning algorithms, including examples and use cases for each type.",
+    "max_tokens": 200,
+    "temperature": 0.7,
+    "iterations": 5,
+    "host": "localhost",
+    "port": 8080
+  },
+  "iterations": [
+    {
+      "wall_s": 2.733859583036974,
+      "output_text": " Machine learning is a rapidly growing field that has numerous applications in various domains. Here is a comprehensive guide on machine learning algorithms, including examples and use cases for each type.\n\n**Introduction to Machine Learning Algorithms**\n\nMachine learning algorithms are designed to learn from data and improve their performance over time. They are used in a variety of fields, including computer vision, natural language processing, recommendation systems, and more. The key components of a machine learning algorithm are:\n\n- **Data**: The data used to train the algorithm. It could be raw data (e.g., images, text) or preprocessed data (e.g., features extracted from data).\n- **Model**: A mathematical model that is trained on the data to make predictions or classifications.\n- **Training**: The process of using the data to train the model, often involving optimization techniques.\n- **Evaluation**: The process of measuring the performance of the model, often using metrics like accuracy, precision, recall, and F1-score.\n- **Deployment**:",
+      "prompt_tokens": 18,
+      "generated_tokens": 200,
+      "tok_per_s": 73.1566468303486,
+      "generation_tok_per_s": 75.34787170517885,
+      "ttft_ms": 75.202,
+      "prefill_ms": 75.202,
+      "generation_ms": 2654.355
+    },
+    {
+      "wall_s": 2.1617219170439057,
+      "output_text": " Additionally, include best practices and tips for selecting the appropriate algorithm for a particular task. Machine learning algorithms are a complex area, and they can be challenging to understand and implement. However, with a good understanding of the algorithms, you can use them to make predictions, classify data, and make decisions based on the data.\n\nThe following are some of the most commonly used machine learning algorithms:\n\n1. Linear Regression: Linear regression is a simple algorithm that is used to predict a continuous outcome based on one or more independent variables. It is the most basic algorithm in machine learning. However, it is not always the best choice for a particular task, as it may not capture the underlying trend in the data.\n\nExample: A restaurant owner wants to predict the number of customers they will receive based on the number of tables in their restaurant. They can use linear regression to predict the number of customers based on the number of tables.\n\nUse Case: Linear regression can be used in various fields, such as finance, marketing",
+      "prompt_tokens": 18,
+      "generated_tokens": 200,
+      "tok_per_s": 92.51883807214871,
+      "generation_tok_per_s": 93.05225349294896,
+      "ttft_ms": 8.216,
+      "prefill_ms": 8.216,
+      "generation_ms": 2149.33
+    },
+    {
+      "wall_s": 2.296964833047241,
+      "output_text": " Machine learning algorithms are used to make predictions or decisions on data, and they can be broadly categorized into several types. Each type has its own specific purpose and characteristics. The following is a comprehensive guide on machine learning algorithms, including examples and use cases for each type.\n\n1. Supervised Learning Algorithms\n\nSupervised learning algorithms are used when you have a labeled dataset. In supervised learning, the algorithm is trained on the labeled data and then used to make predictions or decisions on new, unseen data. The algorithm learns from the examples in the dataset and can then use that information to make predictions. \n\nExamples of supervised learning algorithms include:\n\n- Logistic Regression: Used for binary classification problems where the target variable is binary (e.g. yes/no, 0/1). \n\n- K-Nearest Neighbors (KNN): Used for classification problems where the target variable is continuous and the data is highly skewed. \n\n- Random Forest: Used for classification and regression problems where the target variable is continuous and",
+      "prompt_tokens": 18,
+      "generated_tokens": 200,
+      "tok_per_s": 87.07142448266062,
+      "generation_tok_per_s": 87.51406241590445,
+      "ttft_ms": 8.029,
+      "prefill_ms": 8.029,
+      "generation_ms": 2285.347
+    },
+    {
+      "wall_s": 2.818098124989774,
+      "output_text": " Additionally, provide a detailed explanation of the underlying principles and algorithms behind each algorithm, as well as the various types of errors and their causes. Finally, offer best practices for selecting and configuring machine learning models, including the use of hyperparameters and cross-validation techniques. Machine learning algorithms are a critical tool in the field of artificial intelligence and machine learning. These algorithms are used to train models on data and make predictions or decisions based on the data. In this guide, we will cover the different types of machine learning algorithms and how they work, as well as the underlying principles and algorithms behind each algorithm. We will also discuss the various types of errors and their causes, as well as best practices for selecting and configuring machine learning models. \n\nUnderstanding machine learning algorithms is essential for anyone involved in the field of artificial intelligence and machine learning. There are many different algorithms used in machine learning, and each algorithm has its own strengths and weaknesses. Understanding how machine learning algorithms work, and the different types of errors that can",
+      "prompt_tokens": 18,
+      "generated_tokens": 200,
+      "tok_per_s": 70.96984956857233,
+      "generation_tok_per_s": 71.3546429217443,
+      "ttft_ms": 11.044,
+      "prefill_ms": 11.044,
+      "generation_ms": 2802.901
+    },
+    {
+      "wall_s": 2.4221310829743743,
+      "output_text": " Your guide should be written in clear, concise language and include a detailed explanation of each algorithm's purpose and how it works. Additionally, please include a table that compares and contrasts the different algorithms, along with their key features and limitations. Finally, provide a code example in Python for each algorithm to demonstrate their functionality. Machine learning algorithms are a set of techniques used for predicting the outcome of a machine. They are used to model complex relationships between inputs and outputs, and they can be used for a variety of applications, including classification, regression, and forecasting.\n\nMachine learning algorithms are categorized into several types, including supervised, unsupervised, and deep learning. Each algorithm has its own purpose and how it works. Here is a comprehensive guide on machine learning algorithms and their use cases.\n\n1. Supervised Learning\n\nSupervised learning is used for predicting a continuous output variable given a set of input variables. The input variables are often called features, and the output variable is called the target or response. The",
+      "prompt_tokens": 18,
+      "generated_tokens": 200,
+      "tok_per_s": 82.5719142146511,
+      "generation_tok_per_s": 84.84959560682734,
+      "ttft_ms": 61.431,
+      "prefill_ms": 61.431,
+      "generation_ms": 2357.112
+    }
+  ],
+  "summary": {
+    "median_wall_s": 2.4221310829743743,
+    "median_tok_per_s": 82.5719142146511,
+    "median_ttft_ms": 11.044,
+    "median_generation_tok_per_s": 84.84959560682734
+  },
+  "mode": "text-only",
+  "environment": "stable"
+}
