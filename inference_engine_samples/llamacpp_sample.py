@@ -6,7 +6,7 @@ def main():
         model_path="../models/qwen2.5-0.5b-instruct-q5_k_m.gguf",
         n_ctx=512,
         n_threads=4,
-        n_gpu_layers=0,
+        n_gpu_layers=0,  # use -1 to run all layers on GPU.
         verbose=True,
     )
 
