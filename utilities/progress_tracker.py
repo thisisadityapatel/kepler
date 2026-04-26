@@ -2,6 +2,7 @@
 
 import time
 from contextlib import contextmanager
+from textwrap import dedent
 from typing import Dict, List
 
 from rich.console import Console
@@ -78,9 +79,23 @@ class WorkflowTracker:
         self.steps[step_idx]["start_time"] = time.time()
 
         self.console.clear()
-        self.console.print("[bold]Kepler LLM Workbench[/bold]")
+
+        ascii_art = dedent(
+            """
+            ✦           *           ✦
+                __ __ ______ ____  __    ______ ____
+               / //_// ____// __ \\/ /   / ____// __ \\
+              / ,<  / __/  / /_/ / /   / __/  / /_/ /
+             / /| |/ /___ / ____/ /___/ /___ / _, _/
+            /_/ |_|_____//_/   /_____/_____//_/ |_|
+
+            *   model inference and benchmarking   ✦
+            """
+        ).strip("\n")
+        self.console.print(ascii_art)
         self.console.print()
         self.show_workflow()
+        self.console.print()
 
         try:
             # Don't use spinner for interactive steps like Model Selection

@@ -47,3 +47,7 @@ dist/
 
 # Locally downloaded hugging face models
 *.gguf
+
+# Model results
+perf/
+evaluations/

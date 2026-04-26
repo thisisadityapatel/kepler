@@ -1,12 +1,50 @@
 """Docker image management for vLLM, llama.cpp, and TensorRT-LLM backends."""
 
 import subprocess
+import threading
 import time
 import requests
 from pathlib import Path
 from typing import Optional
 
 from common import BACKEND_REGISTRY
+
+
+def _stream_process_output(process: subprocess.Popen, prefix: str = "") -> None:
+    """Read process stdout line-by-line and print with optional prefix."""
+    try:
+        for line in iter(process.stdout.readline, ""):
+            print(f"{prefix}{line}", end="", flush=True)
+    except Exception as exc:
+        print(f"[debug] output reader error: {exc}", flush=True)
+
+
+def _run_docker(
+    cmd: list[str],
+    *,
+    cwd: Path | None = None,
+    timeout: int | None = None,
+    capture_output: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    """Run a docker CLI command with better failure messages."""
+    try:
+        return subprocess.run(
+            cmd,
+            cwd=str(cwd) if cwd else None,
+            capture_output=capture_output,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(
+            "Docker command timed out. Is Docker Desktop running and responsive?\n"
+            f"Command: {' '.join(cmd)}"
+        ) from e
+    except FileNotFoundError as e:
+        raise RuntimeError(
+            "Docker CLI not found. Install Docker Desktop (or ensure `docker` is on PATH)."
+        ) from e
 
 
 def _docker_run_base(
@@ -92,10 +130,21 @@ class DockerContainer:
     def build_image(self, dockerfile_path: Path, version: str) -> bool:
         """Build Docker image if it doesn't exist."""
         check_cmd = ["docker", "images", "-q", f"{self.image}:{version}"]
-        result = subprocess.run(check_cmd, capture_output=True, text=True)
+        print(f"[debug] checking for existing image: {' '.join(check_cmd)}", flush=True)
+        result = _run_docker(check_cmd, timeout=10)
+        print(f"[debug] image check returncode={result.returncode} stdout={result.stdout.strip()!r}", flush=True)
 
         if result.stdout.strip():
+            print(f"[debug] image {self.image}:{version} already exists, skipping build", flush=True)
             return True
+        if result.returncode != 0:
+            stderr = (result.stderr or "").strip()
+            raise RuntimeError(
+                "Docker is not accessible (failed to query local images). "
+                "Make sure Docker Desktop is running and you have permission to access the Docker socket.\n"
+                f"Command: {' '.join(check_cmd)}"
+                + (f"\nError: {stderr}" if stderr else "")
+            )
 
         build_cmd = [
             "docker",
@@ -109,44 +158,91 @@ class DockerContainer:
             ".",
         ]
 
+        print(f"[debug] building image (this may take several minutes)...", flush=True)
+        print(f"[debug] build command: {' '.join(build_cmd)}", flush=True)
+        print(f"[debug] build cwd: {dockerfile_path.parent.parent}", flush=True)
+
         try:
-            result = subprocess.run(
+            build_process = subprocess.Popen(
                 build_cmd,
-                cwd=dockerfile_path.parent.parent,
-                capture_output=True,
+                cwd=str(dockerfile_path.parent.parent),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
-                timeout=600,
             )
-            return result.returncode == 0
-        except subprocess.TimeoutExpired:
-            return False
-        except Exception:
-            return False
+            print("[debug] docker build process started, streaming output:", flush=True)
+            _stream_process_output(build_process, prefix="  [build] ")
+            try:
+                build_process.wait(timeout=1800)
+            except subprocess.TimeoutExpired:
+                build_process.kill()
+                build_process.wait()
+                print("[debug] docker build timed out after 1800s", flush=True)
+                return False
+            print(f"[debug] docker build finished with returncode={build_process.returncode}", flush=True)
+            if build_process.returncode == 0:
+                return True
+            raise RuntimeError(
+                f"Failed to build Docker image (returncode={build_process.returncode}).\n"
+                f"Command: {' '.join(build_cmd)}"
+            )
+        except Exception as exc:
+            print(f"[debug] exception during build_image: {exc}", flush=True)
+            raise
 
     def start_container(self, docker_cmd: list[str]) -> bool:
         """Start the Docker container."""
+        print(f"[debug] starting container with command:", flush=True)
+        print(f"  {' '.join(docker_cmd)}", flush=True)
         try:
             self.process = subprocess.Popen(
                 docker_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
             )
+            print(f"[debug] container process started (pid={self.process.pid})", flush=True)
+            reader = threading.Thread(
+                target=_stream_process_output,
+                args=(self.process,),
+                kwargs={"prefix": "  [container] "},
+                daemon=True,
+            )
+            reader.start()
+            print("[debug] waiting 2s to check if process stays alive...", flush=True)
             time.sleep(2)
-            return self.process.poll() is None
-        except Exception:
+            poll = self.process.poll()
+            print(f"[debug] process poll after 2s: {poll} (None = still running)", flush=True)
+            return poll is None
+        except Exception as exc:
+            print(f"[debug] exception in start_container: {exc}", flush=True)
             return False
 
     def wait_for_ready(self, timeout: int = 60) -> bool:
         """Wait for the model server to be ready."""
+        completion_url = f"http://localhost:{self.port}/completion"
+        print(f"[debug] waiting for server at {completion_url} (timeout={timeout}s)", flush=True)
         start_time = time.time()
+        last_status_print = start_time
+        attempt = 0
         while time.time() - start_time < timeout:
+            attempt += 1
+            elapsed = time.time() - start_time
+            if self.process and self.process.poll() is not None:
+                print(f"[debug] container process exited early (returncode={self.process.poll()}) after {elapsed:.1f}s", flush=True)
+                return False
             try:
-                completion_url = f"http://localhost:{self.port}/completion"
                 test_payload = {"prompt": "test", "n_predict": 1}
                 response = requests.post(completion_url, json=test_payload, timeout=5)
+                print(f"[debug] health check attempt {attempt}: status={response.status_code} elapsed={elapsed:.1f}s", flush=True)
                 if response.status_code in [200, 400]:
+                    print(f"[debug] server ready after {elapsed:.1f}s", flush=True)
                     return True
-            except requests.exceptions.RequestException:
-                pass
+            except requests.exceptions.ConnectionError as exc:
+                if time.time() - last_status_print >= 10:
+                    print(f"[debug] health check attempt {attempt}: connection refused at {elapsed:.1f}s — server still starting ({exc})", flush=True)
+                    last_status_print = time.time()
+            except requests.exceptions.RequestException as exc:
+                print(f"[debug] health check attempt {attempt}: request error at {elapsed:.1f}s — {exc}", flush=True)
             time.sleep(2)
+        print(f"[debug] server did not become ready within {timeout}s", flush=True)
         return False
 
     def stop_container(self) -> bool:
