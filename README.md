@@ -2,6 +2,12 @@
 
 Personal LLM workbench for macOS. Select, serve, and benchmark models (GGUF) via llama.cpp in Docker.
 
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/48e3263d-7fa2-4cc5-bdac-e4adcad6846f">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 ## Setup
 
 ```bash
