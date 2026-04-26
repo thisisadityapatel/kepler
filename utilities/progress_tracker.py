@@ -115,7 +115,7 @@ class WorkflowTracker:
         finally:
             # Refresh display
             self.console.clear()
-            self.console.print("\n[bold]Kepler LLM Workbench[/bold]")
+            self.console.print(ascii_art)
             self.console.print()
             self.show_workflow()
 

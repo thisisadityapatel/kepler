@@ -95,7 +95,7 @@ Examples:
     if args.list_models:
         models = find_gguf_models()
         if models:
-            print("📋 Available GGUF models:")
+            print("Available GGUF models:")
             for model in models:
                 rel_path = model.relative_to(Path.cwd() / "models")
                 size_mb = model.stat().st_size / (1024 * 1024)
@@ -127,7 +127,9 @@ Examples:
 
         # Step 2: Benchmark Selection (if not specified via args)
         if not args.benchmark or args.benchmark == "standard":
-            print("\n🎯 Select Benchmark Type:")
+            print("\n" + "=" * 60)
+            print("Select Benchmark Type")
+            print("=" * 60)
             print("1. Quick (2 iterations, simple questions)")
             print("2. Standard (3 iterations, medium complexity)")
             print("3. Performance (5 iterations, comprehensive)")

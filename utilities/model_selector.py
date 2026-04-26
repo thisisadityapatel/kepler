@@ -22,7 +22,7 @@ def find_gguf_models(models_dir: Path = ROOT / "models") -> List[Path]:
 def display_models(models: List[Path]) -> None:
     """Display available models in a formatted list."""
     print("\n" + "=" * 60)
-    print("🤖 Available GGUF Models")
+    print("Available GGUF Models")
     print("=" * 60)
 
     if not models:
@@ -55,7 +55,7 @@ def get_user_selection(models: List[Path]) -> Optional[Path]:
 
     while True:
         try:
-            print(f"\n🔍 Select a model (1-{len(models)}) or 'q' to quit: ", end="")
+            print(f"\nSelect a model (1-{len(models)}) or 'q' to quit: ", end="")
             user_input = input().strip()
 
             if user_input.lower() == "q":
@@ -70,7 +70,7 @@ def get_user_selection(models: List[Path]) -> Optional[Path]:
         except ValueError:
             print("❌ Please enter a valid number or 'q' to quit")
         except KeyboardInterrupt:
-            print("\n👋 Goodbye!")
+            print("\nGoodbye!")
             return None
 
 
