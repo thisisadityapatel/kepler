@@ -132,10 +132,16 @@ class DockerContainer:
         check_cmd = ["docker", "images", "-q", f"{self.image}:{version}"]
         print(f"[debug] checking for existing image: {' '.join(check_cmd)}", flush=True)
         result = _run_docker(check_cmd, timeout=10)
-        print(f"[debug] image check returncode={result.returncode} stdout={result.stdout.strip()!r}", flush=True)
+        print(
+            f"[debug] image check returncode={result.returncode} stdout={result.stdout.strip()!r}",
+            flush=True,
+        )
 
         if result.stdout.strip():
-            print(f"[debug] image {self.image}:{version} already exists, skipping build", flush=True)
+            print(
+                f"[debug] image {self.image}:{version} already exists, skipping build",
+                flush=True,
+            )
             return True
         if result.returncode != 0:
             stderr = (result.stderr or "").strip()
@@ -158,7 +164,7 @@ class DockerContainer:
             ".",
         ]
 
-        print(f"[debug] building image (this may take several minutes)...", flush=True)
+        print("[debug] building image (this may take several minutes)...", flush=True)
         print(f"[debug] build command: {' '.join(build_cmd)}", flush=True)
         print(f"[debug] build cwd: {dockerfile_path.parent.parent}", flush=True)
 
@@ -179,7 +185,10 @@ class DockerContainer:
                 build_process.wait()
                 print("[debug] docker build timed out after 1800s", flush=True)
                 return False
-            print(f"[debug] docker build finished with returncode={build_process.returncode}", flush=True)
+            print(
+                f"[debug] docker build finished with returncode={build_process.returncode}",
+                flush=True,
+            )
             if build_process.returncode == 0:
                 return True
             raise RuntimeError(
@@ -192,13 +201,16 @@ class DockerContainer:
 
     def start_container(self, docker_cmd: list[str]) -> bool:
         """Start the Docker container."""
-        print(f"[debug] starting container with command:", flush=True)
+        print("[debug] starting container with command:", flush=True)
         print(f"  {' '.join(docker_cmd)}", flush=True)
         try:
             self.process = subprocess.Popen(
                 docker_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
             )
-            print(f"[debug] container process started (pid={self.process.pid})", flush=True)
+            print(
+                f"[debug] container process started (pid={self.process.pid})",
+                flush=True,
+            )
             reader = threading.Thread(
                 target=_stream_process_output,
                 args=(self.process,),
@@ -209,7 +221,10 @@ class DockerContainer:
             print("[debug] waiting 2s to check if process stays alive...", flush=True)
             time.sleep(2)
             poll = self.process.poll()
-            print(f"[debug] process poll after 2s: {poll} (None = still running)", flush=True)
+            print(
+                f"[debug] process poll after 2s: {poll} (None = still running)",
+                flush=True,
+            )
             return poll is None
         except Exception as exc:
             print(f"[debug] exception in start_container: {exc}", flush=True)
@@ -218,7 +233,10 @@ class DockerContainer:
     def wait_for_ready(self, timeout: int = 60) -> bool:
         """Wait for the model server to be ready."""
         completion_url = f"http://localhost:{self.port}/completion"
-        print(f"[debug] waiting for server at {completion_url} (timeout={timeout}s)", flush=True)
+        print(
+            f"[debug] waiting for server at {completion_url} (timeout={timeout}s)",
+            flush=True,
+        )
         start_time = time.time()
         last_status_print = start_time
         attempt = 0
@@ -226,21 +244,33 @@ class DockerContainer:
             attempt += 1
             elapsed = time.time() - start_time
             if self.process and self.process.poll() is not None:
-                print(f"[debug] container process exited early (returncode={self.process.poll()}) after {elapsed:.1f}s", flush=True)
+                print(
+                    f"[debug] container process exited early (returncode={self.process.poll()}) after {elapsed:.1f}s",
+                    flush=True,
+                )
                 return False
             try:
                 test_payload = {"prompt": "test", "n_predict": 1}
                 response = requests.post(completion_url, json=test_payload, timeout=5)
-                print(f"[debug] health check attempt {attempt}: status={response.status_code} elapsed={elapsed:.1f}s", flush=True)
+                print(
+                    f"[debug] health check attempt {attempt}: status={response.status_code} elapsed={elapsed:.1f}s",
+                    flush=True,
+                )
                 if response.status_code in [200, 400]:
                     print(f"[debug] server ready after {elapsed:.1f}s", flush=True)
                     return True
             except requests.exceptions.ConnectionError as exc:
                 if time.time() - last_status_print >= 10:
-                    print(f"[debug] health check attempt {attempt}: connection refused at {elapsed:.1f}s — server still starting ({exc})", flush=True)
+                    print(
+                        f"[debug] health check attempt {attempt}: connection refused at {elapsed:.1f}s — server still starting ({exc})",
+                        flush=True,
+                    )
                     last_status_print = time.time()
             except requests.exceptions.RequestException as exc:
-                print(f"[debug] health check attempt {attempt}: request error at {elapsed:.1f}s — {exc}", flush=True)
+                print(
+                    f"[debug] health check attempt {attempt}: request error at {elapsed:.1f}s — {exc}",
+                    flush=True,
+                )
             time.sleep(2)
         print(f"[debug] server did not become ready within {timeout}s", flush=True)
         return False
