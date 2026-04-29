@@ -13,7 +13,7 @@ public:
     ~LlamaServer();
 
     void start();
-    bool wait_for_ready(int timeout_s = 120);
+    bool wait_for_ready(int timeout_s = 300);
     void stop();
     bool is_running() const;
     int  port() const { return port_; }

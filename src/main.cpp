@@ -141,9 +141,9 @@ int main(int argc, char* argv[]) {
 
         // ── health check ─────────────────────────────────────────────────
         tracker.start("Health Check");
-        if (!server->wait_for_ready(120)) {
+        if (!server->wait_for_ready(300)) {
             tracker.fail("Health Check");
-            ui::error("Server did not become ready within 120s");
+            ui::error("Server did not become ready within 300s");
             ui::warn("Check logs: " + std::string(SERVER_LOG));
             return 1;
         }
