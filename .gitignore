@@ -1,0 +1,25 @@
+# Build
+build/
+
+# Downloaded headers (managed by Nix now)
+include/
+
+# Models — large binary files, never commit
+models/*.gguf
+models/.cache/
+
+# Benchmark results
+perf/*.json
+
+# Nix
+.direnv/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+*.swp
+
+# Claude
+.claude/
