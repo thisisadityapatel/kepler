@@ -226,7 +226,10 @@ class DockerContainer:
                 flush=True,
             )
             if poll is not None:
-                print("[debug] container exited — waiting for output to flush...", flush=True)
+                print(
+                    "[debug] container exited — waiting for output to flush...",
+                    flush=True,
+                )
                 reader.join(timeout=10)
             return poll is None
         except Exception as exc:
