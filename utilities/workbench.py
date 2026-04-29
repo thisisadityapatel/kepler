@@ -13,6 +13,8 @@ import argparse
 import sys
 from pathlib import Path
 
+import yaml
+
 from benchmark import (
     HARD_QUESTIONS_BENCHMARK,
     PERFORMANCE_BENCHMARK,
@@ -20,12 +22,21 @@ from benchmark import (
     STANDARD_BENCHMARK,
     BenchmarkRunner,
 )
+from common import CONFIG_PATH
 from docker_manager import create_llama_container
 from model_selector import find_gguf_models, select_model_interactive
 from progress_tracker import create_workbench_tracker, status_error, status_info
 
 
+def _load_llama_version() -> str:
+    with open(CONFIG_PATH) as f:
+        config = yaml.safe_load(f)
+    return config["defaults"]["backends"]["llama"]["version"]
+
+
 def main():
+    default_version = _load_llama_version()
+
     parser = argparse.ArgumentParser(
         description="Kepler LLM Workbench - Run, serve and benchmark LLM models on macOS",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -77,8 +88,8 @@ Examples:
         "--version",
         "-v",
         type=str,
-        default="b7531",
-        help="llama.cpp version to use (default: b7531)",
+        default=default_version,
+        help=f"llama.cpp version to use (default: {default_version}, from config/models.yaml)",
     )
 
     parser.add_argument(

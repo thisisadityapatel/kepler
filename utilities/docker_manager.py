@@ -3,10 +3,10 @@
 import subprocess
 import threading
 import time
-import requests
 from pathlib import Path
 from typing import Optional
 
+import requests
 from common import BACKEND_REGISTRY
 
 
@@ -218,13 +218,16 @@ class DockerContainer:
                 daemon=True,
             )
             reader.start()
-            print("[debug] waiting 2s to check if process stays alive...", flush=True)
-            time.sleep(2)
+            print("[debug] waiting 10s to check if process stays alive...", flush=True)
+            time.sleep(10)
             poll = self.process.poll()
             print(
-                f"[debug] process poll after 2s: {poll} (None = still running)",
+                f"[debug] process poll after 10s: {poll} (None = still running)",
                 flush=True,
             )
+            if poll is not None:
+                print("[debug] container exited — waiting for output to flush...", flush=True)
+                reader.join(timeout=10)
             return poll is None
         except Exception as exc:
             print(f"[debug] exception in start_container: {exc}", flush=True)

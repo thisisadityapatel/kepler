@@ -1,1 +1,1 @@
-Filepond for benchmaring results.
+Folder for benchmaring results.
