@@ -3,18 +3,17 @@
 #include "config.h"
 #include "models.h"
 #include "server.h"
+#include "ui.h"
 #include <filesystem>
 #include <iostream>
 #include <memory>
 
-// Walk up from the binary's directory until config/models.yaml is found.
 static std::filesystem::path find_project_root(const char* argv0) {
     std::error_code ec;
     auto root = std::filesystem::canonical(argv0, ec);
     if (ec) root = std::filesystem::current_path();
-
     root = root.parent_path();
-    for (int depth = 0; depth < 4; depth++) {
+    for (int i = 0; i < 4; i++) {
         if (std::filesystem::exists(root / "config" / "models.yaml")) return root;
         auto parent = root.parent_path();
         if (parent == root) break;
@@ -27,115 +26,148 @@ int main(int argc, char* argv[]) {
     CLI::App app{"Kepler — LLM benchmarking for macOS Metal"};
     app.footer("Benchmark types: quick | standard | performance | hard");
 
-    std::string model_path;
-    std::string benchmark_type = "standard";
-    int         port           = 8080;
-    int         ctx_size       = 4096;
-    bool        list_models    = false;
-    bool        no_serve       = false;
+    std::string model_arg;
+    std::string benchmark_arg;       // empty = not set, show interactive picker
+    int         port       = 8080;
+    int         ctx_size   = 4096;
+    bool        list_models = false;
+    bool        no_serve    = false;
 
-    app.add_option("-m,--model",      model_path,      "Path to .gguf model file");
-    app.add_option("-b,--benchmark",  benchmark_type,  "Benchmark preset")->default_val("standard");
-    app.add_option("-p,--port",       port,            "llama-server port")->default_val(8080);
-    app.add_option("-c,--ctx-size",   ctx_size,        "Context size")->default_val(4096);
-    app.add_flag("--list-models",     list_models,     "List available models and exit");
-    app.add_flag("--no-serve",        no_serve,        "Skip server startup (testing only)");
+    app.add_option("-m,--model",     model_arg,     "Path to .gguf model file (skips picker)");
+    app.add_option("-b,--benchmark", benchmark_arg, "Benchmark preset (skips picker)");
+    app.add_option("-p,--port",      port,          "llama-server port")->default_val(8080);
+    app.add_option("-c,--ctx-size",  ctx_size,      "Context size")->default_val(4096);
+    app.add_flag("--list-models",    list_models,   "List available models and exit");
+    app.add_flag("--no-serve",       no_serve,      "Skip server startup (testing only)");
 
     CLI11_PARSE(app, argc, argv);
 
-    auto root       = find_project_root(argv[0]);
-    auto models_dir = root / "models";
+    auto root        = find_project_root(argv[0]);
+    auto models_dir  = root / "models";
     auto config_path = root / "config" / "models.yaml";
-    auto perf_dir   = root / "perf";
+    auto perf_dir    = root / "perf";
 
     // ── load config ──────────────────────────────────────────────────────
     AppConfig cfg;
     try {
         cfg = load_config(config_path.string());
     } catch (const std::exception& e) {
-        std::cerr << "[kepler] " << e.what() << "\n";
+        ui::error(e.what());
         return 1;
     }
 
     // ── list models ──────────────────────────────────────────────────────
     if (list_models) {
+        ui::print_banner();
         auto models = find_gguf_models(models_dir);
         if (models.empty()) {
-            std::cout << "No .gguf models found in " << models_dir.string() << "\n";
+            ui::warn("No .gguf models found in " + models_dir.string());
         } else {
-            std::cout << "Available models in " << models_dir.string() << ":\n";
+            std::cout << "  Available models:\n\n";
             for (auto& m : models) {
                 auto bytes = std::filesystem::file_size(m);
-                std::cout << "  " << m.filename().string()
-                          << "  (" << (bytes / (1024 * 1024)) << " MB)\n";
+                std::cout << "  " << ui::CYAN << "▸" << ui::RESET << " "
+                          << m.filename().string()
+                          << ui::DIM << "  (" << (bytes / (1024 * 1024)) << " MB)"
+                          << ui::RESET << "\n";
             }
+            std::cout << "\n";
         }
         return 0;
     }
 
-    // ── select model ─────────────────────────────────────────────────────
+    // ── phase 1: interactive selections (before tracker clears screen) ───
+    // All user prompts happen here so the tracker's clear+redraw never
+    // wipes an in-progress interactive prompt.
+
+    ui::print_banner();
+
+    // Model selection
     std::filesystem::path selected;
-    if (!model_path.empty()) {
-        selected = model_path;
+    if (!model_arg.empty()) {
+        selected = model_arg;
         if (!std::filesystem::exists(selected)) {
-            std::cerr << "[kepler] Model not found: " << model_path << "\n";
+            ui::error("Model not found: " + model_arg);
             return 1;
         }
+        ui::success("Model: " + selected.filename().string());
     } else {
+        auto models = find_gguf_models(models_dir);
         try {
-            auto models = find_gguf_models(models_dir);
-            selected    = select_model_interactive(models);
+            selected = select_model_interactive(models);
+            ui::success("Model: " + selected.filename().string());
         } catch (const std::exception& e) {
-            std::cerr << "[kepler] " << e.what() << "\n";
+            ui::error(e.what());
             return 1;
         }
     }
 
     std::cout << "\n";
-    std::cout << "[kepler] model:     " << selected.filename().string() << "\n";
-    std::cout << "[kepler] benchmark: " << benchmark_type << "\n";
-    std::cout << "[kepler] port:      " << port << "\n\n";
 
-    // ── start server ─────────────────────────────────────────────────────
+    // Benchmark selection
+    std::string benchmark_type = benchmark_arg;
+    if (benchmark_type.empty()) {
+        benchmark_type = ui::pick_benchmark();
+    }
+    ui::success("Benchmark: " + benchmark_type);
+    std::cout << "\n";
+
+    // ── phase 2: automated pipeline with workflow tracker ────────────────
+    ui::WorkflowTracker tracker;
+    tracker.add("Server Start");
+    tracker.add("Health Check");
+    tracker.add("Benchmarking");
+    tracker.add("Save Results");
+    tracker.redraw();
+
+    // ── server start ─────────────────────────────────────────────────────
     std::unique_ptr<LlamaServer> server;
     if (!no_serve) {
-        std::error_code ec;
-        auto abs_model = std::filesystem::canonical(selected, ec);
-        if (ec) abs_model = selected;
-
-        server = std::make_unique<LlamaServer>(abs_model.string(), port, cfg.n_gpu_layers, ctx_size);
-
-        std::cout << "[1/4] Starting llama-server...\n";
+        tracker.start("Server Start");
         try {
+            std::error_code ec;
+            auto abs_model = std::filesystem::canonical(selected, ec);
+            if (ec) abs_model = selected;
+
+            server = std::make_unique<LlamaServer>(
+                abs_model.string(), port, cfg.n_gpu_layers, ctx_size);
             server->start();
+            tracker.done("Server Start");
         } catch (const std::exception& e) {
-            std::cerr << "[kepler] " << e.what() << "\n";
+            tracker.fail("Server Start");
+            ui::error(e.what());
             return 1;
         }
 
-        std::cout << "[2/4] Waiting for server to be ready (model loading into Metal)...\n";
+        // ── health check ─────────────────────────────────────────────────
+        tracker.start("Health Check");
         if (!server->wait_for_ready(120)) {
-            std::cerr << "[kepler] Server did not become ready within 120s\n";
+            tracker.fail("Health Check");
+            ui::error("Server did not become ready within 120s");
+            ui::warn("Check logs: " + std::string(SERVER_LOG));
             return 1;
         }
-        std::cout << "[2/4] Server ready.\n\n";
+        tracker.done("Health Check");
+    } else {
+        tracker.done("Server Start");
+        tracker.done("Health Check");
     }
 
-    // ── run benchmarks ───────────────────────────────────────────────────
-    std::cout << "[3/4] Running benchmarks...\n";
+    // ── benchmarking ─────────────────────────────────────────────────────
+    tracker.start("Benchmarking");
     std::vector<BenchmarkResult> results;
-
     try {
         if (benchmark_type == "hard") {
             if (cfg.hard_questions.empty()) {
-                std::cerr << "[kepler] No hard questions found in config\n";
+                tracker.fail("Benchmarking");
+                ui::error("No hard questions found in config");
                 return 1;
             }
             for (size_t i = 0; i < cfg.hard_questions.size(); i++) {
                 auto& q = cfg.hard_questions[i];
-                std::cout << "\n  Hard question " << (i + 1) << "/" << cfg.hard_questions.size();
-                if (!q.description.empty()) std::cout << ": " << q.description;
-                std::cout << "\n";
+                ui::info("Hard question " + std::to_string(i + 1) + "/" +
+                         std::to_string(cfg.hard_questions.size()) +
+                         (q.description.empty() ? "" : ": " + q.description));
 
                 BenchmarkConfig bcfg;
                 bcfg.prompt_set  = "hard_question_" + std::to_string(i + 1);
@@ -145,17 +177,15 @@ int main(int argc, char* argv[]) {
                 bcfg.iterations  = 3;
                 bcfg.host        = "localhost";
                 bcfg.port        = port;
-
                 results.push_back(run_benchmark(selected.string(), bcfg));
             }
         } else {
             auto it = cfg.benchmarks.find(benchmark_type);
             if (it == cfg.benchmarks.end()) {
-                std::cerr << "[kepler] Unknown benchmark type: " << benchmark_type << "\n";
-                std::cerr << "[kepler] Available: quick, standard, performance, hard\n";
+                tracker.fail("Benchmarking");
+                ui::error("Unknown benchmark type: " + benchmark_type);
                 return 1;
             }
-
             auto& preset = it->second;
             BenchmarkConfig bcfg;
             bcfg.prompt_set  = preset.prompt_set;
@@ -165,20 +195,28 @@ int main(int argc, char* argv[]) {
             bcfg.iterations  = preset.iterations;
             bcfg.host        = "localhost";
             bcfg.port        = port;
-
             results.push_back(run_benchmark(selected.string(), bcfg));
         }
+        tracker.done("Benchmarking");
     } catch (const std::exception& e) {
-        std::cerr << "[kepler] Benchmark failed: " << e.what() << "\n";
+        tracker.fail("Benchmarking");
+        ui::error(e.what());
         return 1;
     }
 
-    // ── save and print ───────────────────────────────────────────────────
-    std::cout << "\n[4/4] Saving results...\n";
-    for (auto& r : results) {
-        print_summary(r);
-        save_result(r, perf_dir);
+    // ── save results ─────────────────────────────────────────────────────
+    tracker.start("Save Results");
+    try {
+        for (auto& r : results) save_result(r, perf_dir);
+        tracker.done("Save Results");
+    } catch (const std::exception& e) {
+        tracker.fail("Save Results");
+        ui::error(e.what());
+        return 1;
     }
+
+    tracker.summary();
+    for (auto& r : results) print_summary(r);
 
     return 0;
 }

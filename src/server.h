@@ -2,6 +2,8 @@
 #include <string>
 #include <unistd.h>
 
+inline constexpr const char* SERVER_LOG = "/tmp/kepler-llama-server.log";
+
 class LlamaServer {
 public:
     LlamaServer(const std::string& model_path,

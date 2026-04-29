@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <curl/curl.h>
@@ -24,6 +25,14 @@ void LlamaServer::start() {
         throw std::runtime_error(std::string("fork() failed: ") + strerror(errno));
 
     if (pid_ == 0) {
+        // Redirect all server output to log file — keeps our UI clean
+        int fd = open(SERVER_LOG, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd >= 0) {
+            dup2(fd, STDOUT_FILENO);
+            dup2(fd, STDERR_FILENO);
+            close(fd);
+        }
+
         std::vector<std::string> str_args = {
             "llama-server",
             "-m", model_path_,
@@ -31,7 +40,6 @@ void LlamaServer::start() {
             "--port", std::to_string(port_),
             "-ngl", std::to_string(n_gpu_layers_),
             "-c", std::to_string(ctx_size_),
-            "-v",
         };
 
         std::vector<char*> argv;
@@ -39,9 +47,9 @@ void LlamaServer::start() {
         argv.push_back(nullptr);
 
         execvp(argv[0], argv.data());
-
-        std::cerr << "\n[kepler] execvp(\"llama-server\") failed: " << strerror(errno) << "\n";
-        std::cerr << "[kepler] Is llama-server on PATH? Run: nix develop\n";
+        // execvp failed — write to stderr (which is now the log file)
+        std::cerr << "execvp(\"llama-server\") failed: " << strerror(errno) << "\n";
+        std::cerr << "Is llama-server on PATH? Run: nix develop\n";
         _exit(1);
     }
 }
@@ -61,8 +69,7 @@ static bool check_health(int port) {
 
     std::string url = "http://127.0.0.1:" + std::to_string(port) + "/health";
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
-    // discard response body
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
         +[](char*, size_t s, size_t n, void*) -> size_t { return s * n; });
 
@@ -70,29 +77,37 @@ static bool check_health(int port) {
     long code = 0;
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
     curl_easy_cleanup(curl);
-
     return res == CURLE_OK && code == 200;
 }
 
 bool LlamaServer::wait_for_ready(int timeout_s) {
     auto start = std::chrono::steady_clock::now();
 
+    // Brief pause then check it didn't immediately crash
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    if (!is_running()) {
-        std::cerr << "[kepler] llama-server exited immediately — is it on PATH? (nix develop)\n";
-        return false;
-    }
-
-    std::cout << "[kepler] Model loading, watching for Metal init...\n";
+    if (!is_running()) return false;
 
     while (true) {
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::steady_clock::now() - start).count();
+        int elapsed = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::steady_clock::now() - start).count());
 
-        if (elapsed >= timeout_s) return false;
-        if (!is_running())        return false;
+        if (elapsed >= timeout_s) {
+            std::cout << "\n";
+            return false;
+        }
+        if (!is_running()) {
+            std::cout << "\n";
+            return false;
+        }
 
-        if (check_health(port_)) return true;
+        // Inline elapsed counter — \r rewrites the same line cleanly
+        std::cout << "\r  Loading model... " << elapsed << "s"
+                  << "   (log: " << SERVER_LOG << ")   " << std::flush;
+
+        if (check_health(port_)) {
+            std::cout << "\n";
+            return true;
+        }
 
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }

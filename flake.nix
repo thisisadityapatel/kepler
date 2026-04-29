@@ -14,7 +14,7 @@
         pkgs.pkg-config
         pkgs.nlohmann_json
         pkgs.cli11
-        pkgs.curl
+        pkgs.curl.dev
       ];
     };
   };
