@@ -23,7 +23,7 @@ Inference, benchmark, and compare LLMs (GGUF) via llama.cpp engine on macOS with
 make setup
 ```
 
-This installs [Nix](https://determinate.systems/nix/) if you don't have it, then builds the binary. If Nix was just installed, open a new terminal and run `make build` to finish.
+This installs [Nix](https://nixos.org/) if you don't have it, then builds the binary. If Nix was just installed, open a new terminal and run `make build` to finish.
 
 **2. Add models**
 
