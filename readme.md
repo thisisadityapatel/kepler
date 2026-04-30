@@ -1,6 +1,10 @@
 ## Kepler
 
-Inference, benchmark, and compare LLMs (GGUF) via llama.cpp nce engine on macOS with native Metal GPU acceleration.
+Inference, benchmark, and compare LLMs (GGUF) via llama.cpp engine on macOS with native Metal GPU acceleration.
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/b967c2fc-588f-4bcb-9971-87030a692327"></video>
+</div>
 
 ---
 
