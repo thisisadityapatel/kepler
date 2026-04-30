@@ -15,7 +15,7 @@ else
 endif
 
 build:
-	nix develop --command bash -c "cmake -B build -G Ninja && cmake --build build"
+	nix develop --command bash -c "rm -rf build && cmake -B build -G Ninja && cmake --build build"
 
 run: $(BINARY)
 	nix develop --command $(BINARY) $(ARGS)
