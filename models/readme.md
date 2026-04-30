@@ -8,4 +8,4 @@ Run the following command to download the .gguf into the current directory:
 hf download Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q5_k_m.gguf --local-dir .
 ```
 
-NOTE: the .gguf file needs to be in the `models` directory to be picked up by Kepler.
+NOTE: the .gguf file needs to be in this `models` directory to be picked up by Kepler.

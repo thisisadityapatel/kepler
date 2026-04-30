@@ -2,19 +2,11 @@
 defaults:
   backends:
     # https://github.com/ggerganov/llama.cpp/releases
-    # Staying on b7531 (last version before that change) for stable performance
     llama:
       version: b8971
       image_type: build
       args:
         n_gpu_layers: 999
-
-# Models configuration
-models:
-  - repo_id: unsloth/qwen2.5
-    include:
-      - "qwen2.5/*.gguf"
-    backends: llama
 
 # Benchmark configuration
 benchmark_questions:

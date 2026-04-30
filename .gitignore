@@ -1,53 +1,25 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# Build
+build/
 
-# Virtual Environments
-.venv/
-venv/
-ENV/
-env/
+# Downloaded headers (managed by Nix now)
+include/
 
-# uv
-.uv/
+# Models — large binary files, never commit
+models/*.gguf
+models/.cache/
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-*.cover
+# Benchmark results
+perf/*.json
 
-# Linting
-.ruff_cache/
-.mypy_cache/
+# Nix
+.direnv/
 
-# MacOS
+# macOS
 .DS_Store
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-*.egg
+# Editor
+.idea/
+*.swp
 
-# Jupyter Notebooks
-.ipynb_checkpoints/
-*.ipynb
-
-# Environment variables
-.env
-.env.local
-
-# Anything cache
-*.cache
-
-# Locally downloaded hugging face models
-*.gguf
-
-# Model results
-perf/
-evaluations/
+# Claude
+.claude/

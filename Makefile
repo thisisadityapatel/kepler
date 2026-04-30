@@ -1,35 +1,27 @@
-.PHONY: help install test lint hf_cache run
+NIX     := $(shell which nix 2>/dev/null)
+BINARY  := ./build/kepler
+ARGS    ?=
 
-help:
-	@echo "Available commands:"
-	@echo "  make install    - Install dependencies"
-	@echo "  make test       - Run unit tests with pytest"
-	@echo "  make lint       - Run and fix linting checks with ruff"
-	@echo "  make hf_cache   - Hugging face locally downloaded models data"
-	@echo "  make run        - Run Project"
+.PHONY: setup build run clean
 
-install:
-	uv venv && \
-	source .venv/bin/activate && \
-	uv sync && \
-	uv pip install -r requirements.txt
+setup:
+ifndef NIX
+	@echo "==> Installing Nix (Determinate Systems)..."
+	curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+	@echo ""
+	@echo "  Nix installed. Open a new terminal, then run: make build"
+else
+	@$(MAKE) build
+endif
 
-test:
-	uv run pytest -v
+build:
+	nix develop --command bash -c "rm -rf build && cmake -B build -G Ninja && cmake --build build"
 
-lint:
-	uv run ruff check --fix .
-	uv run ruff format .
+run: $(BINARY)
+	nix develop --command $(BINARY) $(ARGS)
 
-hf_cache:
-	@echo "\nCache Location: ~/.cache/huggingface/"
-	@echo "\nTotal Size:"
-	@du -sh ~/.cache/huggingface/
-	@echo "\nSize by Model:"
-	@du -sh ~/.cache/huggingface/hub/models--* 2>/dev/null || echo "No models cached"
-	@echo "\nAll Cached Items:"
-	@ls -lh ~/.cache/huggingface/hub/ 2>/dev/null || echo "Cache directory not found"
+clean:
+	rm -rf build
 
-run:
-	source .venv/bin/activate && \
-	uv run python utilities/workbench.py
+$(BINARY):
+	@$(MAKE) build
