@@ -40,6 +40,7 @@ void LlamaServer::start() {
             "--port", std::to_string(port_),
             "-ngl", std::to_string(n_gpu_layers_),
             "-c", std::to_string(ctx_size_),
+            "--flash-attn", "on",
         };
 
         std::vector<char*> argv;

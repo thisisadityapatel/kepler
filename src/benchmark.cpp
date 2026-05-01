@@ -120,6 +120,15 @@ BenchmarkIteration run_once(const BenchmarkConfig& cfg) {
 BenchmarkResult run_benchmark(const std::string& model_path, const BenchmarkConfig& cfg) {
     std::vector<BenchmarkIteration> iters;
 
+    // Warmup: one throwaway request to compile Metal shaders and warm the KV cache
+    std::cout << "  [warmup] running...\n";
+    try {
+        BenchmarkConfig warmup_cfg = cfg;
+        warmup_cfg.max_tokens = 16;
+        run_once(warmup_cfg);
+        std::cout << "  [warmup] done\n";
+    } catch (...) {}
+
     for (int i = 0; i < cfg.iterations; i++) {
         try {
             auto it = run_once(cfg);
