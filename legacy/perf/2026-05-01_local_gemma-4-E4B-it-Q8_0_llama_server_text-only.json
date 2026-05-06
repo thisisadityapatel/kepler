@@ -1,0 +1,85 @@
+{
+  "config": {
+    "host": "localhost",
+    "iterations": 5,
+    "max_tokens": 200,
+    "port": 8080,
+    "prompt": "Write a comprehensive guide on machine learning algorithms, including examples and use cases for each type.",
+    "prompt_set": "performance",
+    "temperature": 0.699999988079071
+  },
+  "engine": "llama-server",
+  "environment": "stable",
+  "iterations": [
+    {
+      "generated_tokens": 200,
+      "generation_ms": 10456.221,
+      "generation_tok_per_s": 19.127369247455654,
+      "output_text": "\n\n---\n\n# The Comprehensive Guide to Machine Learning Algorithms\n\nMachine Learning (ML) is a field of Artificial Intelligence (AI) that enables computer systems to \"learn\" patterns from data without being explicitly programmed. The choice of algorithm dictates how the model learns, what kind of data it handles best, and what problems it can solve.\n\nThis guide provides a comprehensive overview of the major categories of ML algorithms, detailing their mechanics, providing practical examples, and outlining real-world use cases.\n\n---\n\n## 🧠 I. Supervised Learning Algorithms\n\n**Concept:** Supervised learning is like having a teacher. You provide the algorithm with a dataset that is **labeled**, meaning every input data point ($\\text{X}$) is paired with the correct output or target ($\\text{Y}$). The algorithm learns a mapping function $f: \\text{X} \\rightarrow \\text{Y}$ to predict the output for new, unseen inputs.\n\n**Two Primary Types:**\n1.  **",
+      "prefill_ms": 173.339,
+      "prompt_tokens": 19,
+      "tok_per_s": 18.813816612934016,
+      "ttft_ms": 173.339,
+      "wall_s": 10.63048525
+    },
+    {
+      "generated_tokens": 200,
+      "generation_ms": 10433.437,
+      "generation_tok_per_s": 19.169138606961443,
+      "output_text": "\n\n***\n\n# 🧠 The Comprehensive Guide to Machine Learning Algorithms\n\nMachine Learning (ML) is a field of Artificial Intelligence that enables computer systems to \"learn\" patterns directly from data without being explicitly programmed for every task. The power of ML lies in its ability to adapt and improve over time as it is fed more data.\n\nThis guide provides a comprehensive overview of the most fundamental and powerful ML algorithms, categorized by their primary function (Supervised, Unsupervised, Reinforcement Learning).\n\n---\n\n## 🚀 Part 1: Supervised Learning (Learning with a Teacher)\n\nIn supervised learning, the algorithm is trained on a dataset that is **labeled**. This means the input data ($\\text{X}$) is paired with the correct output ($\\text{Y}$). The goal is to learn a mapping function ($f$) such that $Y = f(X)$.\n\nSupervised learning tasks fall into two main categories: **Classification** (predicting a category) and **Regression** (",
+      "prefill_ms": 173.125,
+      "prompt_tokens": 19,
+      "tok_per_s": 18.85072864821384,
+      "ttft_ms": 173.125,
+      "wall_s": 10.609669458
+    },
+    {
+      "generated_tokens": 200,
+      "generation_ms": 10463.451,
+      "generation_tok_per_s": 19.114152682513637,
+      "output_text": "\n\n---\n\n# The Comprehensive Guide to Machine Learning Algorithms\n\nMachine Learning (ML) is a field of Artificial Intelligence (AI) that enables computer systems to \"learn\" from data without being explicitly programmed. The algorithms are the mathematical models that allow these systems to find patterns, make predictions, and take decisions.\n\nThis guide provides a comprehensive overview of the major categories of ML algorithms, detailing how they work, providing practical examples, and outlining real-world use cases for each.\n\n---\n\n## 🧠 I. Supervised Learning Algorithms\n\nSupervised learning algorithms are trained on a **labeled dataset**. This means that for every input data point ($\\mathbf{X}$), there is a corresponding desired output or \"label\" ($\\mathbf{y}$) that the model learns to predict.\n\n**Goal:** To map inputs to outputs based on examples provided.\n\n### 1. Linear Regression\n* **Concept:** The simplest form of regression. It assumes a linear relationship between the input features and the",
+      "prefill_ms": 173.169,
+      "prompt_tokens": 19,
+      "tok_per_s": 18.7975562753897,
+      "ttft_ms": 173.169,
+      "wall_s": 10.639680875
+    },
+    {
+      "generated_tokens": 200,
+      "generation_ms": 10596.07,
+      "generation_tok_per_s": 18.874922494849507,
+      "output_text": "\n\n---\n\n# 🧠 The Comprehensive Guide to Machine Learning Algorithms\n\nMachine Learning (ML) is a field of Artificial Intelligence that enables systems to learn from data without being explicitly programmed. The algorithms are the mathematical models that allow these systems to \"learn\" patterns, make predictions, and take decisions.\n\nThis guide will break down the major categories of ML algorithms, providing definitions, practical examples, and real-world use cases for each.\n\n---\n\n## 🌟 Part 1: The Core Paradigms of Machine Learning\n\nBefore diving into specific algorithms, it's crucial to understand the three primary ways ML problems are framed:\n\n### 1. Supervised Learning\n**Concept:** The model learns from a dataset that is **labeled**. This means every input data point ($\\text{X}$) is paired with the correct output/target ($\\text{Y}$). The algorithm's goal is to learn the mapping function $f: \\text{X} \\rightarrow \\text{Y",
+      "prefill_ms": 174.24,
+      "prompt_tokens": 19,
+      "tok_per_s": 18.561295860582764,
+      "ttft_ms": 174.24,
+      "wall_s": 10.77510975
+    },
+    {
+      "generated_tokens": 200,
+      "generation_ms": 10461.252,
+      "generation_tok_per_s": 19.118170559317374,
+      "output_text": "\n\n***\n\n# 🧠 The Comprehensive Guide to Machine Learning Algorithms\n\nMachine Learning (ML) is a field of Artificial Intelligence (AI) that enables computer systems to \"learn\" from data without being explicitly programmed. The algorithms are the mathematical recipes that allow these systems to find patterns, make predictions, and draw conclusions from massive datasets.\n\nThis guide breaks down the major categories of ML algorithms, providing detailed explanations, practical examples, and real-world use cases for each.\n\n---\n\n## 📊 I. Supervised Learning Algorithms\n\nSupervised learning is the most common paradigm. In this approach, the algorithm is trained on a **labeled dataset**. This means every input data point ($\\mathbf{X}$) is paired with the correct output ($\\mathbf{y}$). The goal is for the model to learn the mapping function $f: \\mathbf{X} \\to \\mathbf{y}$.\n\nSupervised learning problems are divided into two main types: **Classification** and **Regression**.\n\n###",
+      "prefill_ms": 176.833,
+      "prompt_tokens": 19,
+      "tok_per_s": 18.785276695581704,
+      "ttft_ms": 176.833,
+      "wall_s": 10.646635833
+    }
+  ],
+  "mode": "text-only",
+  "model_ref": "/Users/adityapatel/Documents/kepler/models/gemma-4-E4B-it-Q8_0.gguf",
+  "repo_id": "local/gemma-4-E4B-it-Q8_0",
+  "summary": {
+    "median_generation_tok_per_s": 19.118170559317374,
+    "median_tok_per_s": 18.7975562753897,
+    "median_ttft_ms": 173.339,
+    "median_wall_s": 10.639680875
+  },
+  "system_info": {
+    "architecture": "arm64",
+    "platform": "Darwin",
+    "processor": "Apple M4"
+  },
+  "timestamp": "2026-05-01T15:08:30.241554"
+}
