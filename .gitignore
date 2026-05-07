@@ -7,6 +7,9 @@ include/
 # Models — large binary files, never commit
 models/*.gguf
 models/.cache/
+models/**/*.gguf
+models/**/*.safetensors
+models/**/*.bin
 
 # Benchmark results
 perf/*.json
@@ -23,3 +26,18 @@ perf/*.json
 
 # Claude
 .claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+dist/
+.tox/
+uv.lock.bak
