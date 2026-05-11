@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
+import tempfile
 import time
+from pathlib import Path
 
 import httpx
 
@@ -32,6 +35,8 @@ class OllamaEngine(InferenceEngine):
         self._owns_daemon = owns_daemon
         self._daemon_proc: subprocess.Popen | None = None
         self._tag: str | None = None
+        self._local_path: Path | None = None
+        self._installed_this_run = False
         self._client = httpx.Client(timeout=GENERATE_TIMEOUT_S)
 
     @property
@@ -49,10 +54,16 @@ class OllamaEngine(InferenceEngine):
         if model.ollama_tag is None:
             raise RuntimeError("OllamaEngine.load: ModelSpec.ollama_tag is required")
         self._tag = model.ollama_tag
+        self._local_path = model.local_path
         if not _daemon_reachable(self.base_url):
             self._spawn_daemon()
-        if not _tag_present(self._client, self.base_url, self._tag):
+        if _tag_present(self._client, self.base_url, self._tag):
+            return
+        if self._local_path is not None and self._local_path.is_file():
+            self._create_from_file(self._tag, self._local_path)
+        else:
             self._pull(self._tag)
+        self._installed_this_run = True
 
     def infer(self, prompt: str, max_tokens: int, temperature: float) -> EngineResult:
         if self._tag is None:
@@ -102,6 +113,16 @@ class OllamaEngine(InferenceEngine):
                 )
             except Exception:
                 pass
+            if self._installed_this_run:
+                try:
+                    self._client.request(
+                        "DELETE",
+                        f"{self.base_url}/api/delete",
+                        json={"name": self._tag},
+                        timeout=30.0,
+                    )
+                except Exception:
+                    pass
         try:
             self._client.close()
         except Exception:
@@ -118,6 +139,8 @@ class OllamaEngine(InferenceEngine):
                 pass
             self._daemon_proc = None
         self._tag = None
+        self._local_path = None
+        self._installed_this_run = False
 
     def _spawn_daemon(self) -> None:
         if shutil.which("ollama") is None:
@@ -145,6 +168,33 @@ class OllamaEngine(InferenceEngine):
             resp.raise_for_status()
             for _ in resp.iter_lines():
                 pass
+
+    def _create_from_file(self, tag: str, path: Path) -> None:
+        """Import a local .gguf into Ollama via `ollama create -f Modelfile`. The
+        daemon copies the file into its blob store, so we delete the tag on unload
+        to avoid leaving a duplicate behind."""
+        if shutil.which("ollama") is None:
+            raise RuntimeError(
+                "Ollama daemon is reachable but `ollama` binary not on PATH — "
+                "needed to import local GGUF files"
+            )
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".Modelfile", delete=False, encoding="utf-8"
+        ) as f:
+            f.write(f"FROM {path.resolve()}\n")
+            modelfile = f.name
+        try:
+            subprocess.run(
+                ["ollama", "create", tag, "-f", modelfile],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError as exc:
+            err = exc.stderr.decode("utf-8", "ignore").strip() if exc.stderr else ""
+            raise RuntimeError(f"`ollama create {tag}` failed: {err or exc}") from exc
+        finally:
+            Path(modelfile).unlink(missing_ok=True)
 
 
 def _ns_to_ms(ns: int | float | None) -> float:
@@ -178,6 +228,14 @@ def _probe() -> tuple[bool, str | None]:
     if _daemon_reachable(OLLAMA_BASE_URL):
         return True, None
     return False, "Ollama not installed (binary not on PATH and daemon not reachable)"
+
+
+def local_tag_for_path(path: Path) -> str:
+    """Deterministic Ollama tag for a local .gguf so re-runs reuse the same import
+    and `unload()` can delete it. Sanitized to Ollama's allowed character set."""
+    stem = path.stem.lower()
+    sanitized = re.sub(r"[^a-z0-9._-]", "-", stem).strip("-.") or "model"
+    return f"kepler-local-{sanitized}:latest"
 
 
 def derive_tag_from_repo(repo_id: str) -> str:

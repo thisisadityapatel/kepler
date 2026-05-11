@@ -43,7 +43,14 @@ def _project_paths() -> tuple[Path, Path, Path]:
 
 @app.command("benchmark")
 def cmd_benchmark(
-    model: str = typer.Argument(..., help="HF repo id (e.g. Qwen/Qwen2.5-0.5B-Instruct) or a local path"),
+    model: str = typer.Argument(
+        ...,
+        help=(
+            "Model tag (e.g. qwen2.5:0.5b). For --format gguf, kepler looks in models/ "
+            "for a .gguf whose name contains every piece of the tag. For --format mlx, "
+            "the tag is passed to Ollama; MLX-native engines fetch their own artifacts."
+        ),
+    ),
     fmt: Optional[str] = typer.Option(
         None, "--format", "-f", help="gguf | mlx (required unless --engine implies one)"
     ),
