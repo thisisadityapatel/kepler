@@ -133,7 +133,8 @@ def find_free_port() -> int:
 
 
 def cooldown(seconds: int, on_tick=None) -> None:
-    """Sleep `seconds` total. If on_tick is provided, call on_tick(remaining) every second."""
+    """Sleep `seconds` total. If on_tick is provided, call on_tick(remaining) every
+    second, then once more with remaining=0 so the caller can dismiss any UI."""
     if seconds <= 0:
         return
     end = time.monotonic() + seconds
@@ -144,6 +145,8 @@ def cooldown(seconds: int, on_tick=None) -> None:
         if on_tick is not None:
             on_tick(int(round(remaining)))
         time.sleep(min(1.0, remaining))
+    if on_tick is not None:
+        on_tick(0)
 
 
 def write_partial_marker(perf_dir: Path, comparison_id: str) -> Path:
