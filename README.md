@@ -64,12 +64,6 @@ Results land in `perf/` as JSON, plus a `comparison_<id>.json` when more than on
 | `--ollama-tag` | string | Override the Ollama tag derived from the model id. |
 | `--offline` | flag | Skip Hugging Face Hub probes; use the local cache only. |
 
-Example — compare just llama.cpp and Ollama in performance mode:
-
-```shell
-uv run kepler benchmark qwen2.5:0.5b --format gguf --mode performance --only-engine llamacpp,ollama
-```
-
 ## Other commands
 
 ```shell
