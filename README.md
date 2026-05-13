@@ -34,8 +34,16 @@ MLX engines fetch their own artifacts from Hugging Face on first run.
 
 ## Run
 
+MLX format:
+
 ```shell
 uv run kepler benchmark mlx-community/Qwen2.5-0.5B-Instruct-4bit --format mlx
+```
+
+GGUF format:
+
+```shell
+uv run kepler benchmark qwen2.5:0.5b --format gguf
 ```
 
 Modes: `quick`, `standard`, `performance`. Results land in `perf/` as JSON.
