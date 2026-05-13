@@ -1,0 +1,45 @@
+[project]
+name = "kepler"
+version = "0.2.0"
+description = "Benchmark any LLM on macOS Metal GPU across inference engines"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Aditya Patel" }]
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "pyyaml>=6.0",
+    "huggingface_hub>=0.23",
+    "llama-cpp-python>=0.3",
+    "mlx-lm>=0.21",
+    "httpx>=0.27",
+    "openai>=1.30",
+    "psutil>=5.9",
+    "python-ulid>=2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff", "mypy"]
+
+[project.scripts]
+kepler = "kepler.cli.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kepler"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
