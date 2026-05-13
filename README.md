@@ -52,8 +52,8 @@ Results land in `perf/` as JSON, plus a `comparison_<id>.json` when more than on
 
 | Flag | Values | Description |
 |------|--------|-------------|
-| `--format`, `-f` | `gguf`, `mlx` | Model format. Required unless `--engine` implies one. |
-| `--mode`, `-m` | `quick`, `standard`, `performance` | Preset for iterations, max tokens, and prompt. Default `standard`. |
+| `--format` | `gguf`, `mlx` | Model format. Required unless `--engine` implies one. |
+| `--mode` | `quick`, `standard`, `performance` | Preset for iterations, max tokens, and prompt. Default `standard`. |
 | `--engine` | `llamacpp`, `mlx`, `ollama`, `vllm`, `sglang` | Run a single engine (skips comparison output). |
 | `--only-engine` | comma-separated list | Allowlist of engines to run. |
 | `--skip-engine` | comma-separated list | Denylist of engines to skip. |
