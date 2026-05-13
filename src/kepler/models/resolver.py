@@ -161,13 +161,27 @@ def _resolve_mlx_hub(
     ollama_tag_override: str | None,
 ) -> list[ResolvedEngine]:
     """MLX path: each engine uses its own native source. Ollama pulls via its
-    library (`ollama pull <tag>`); MLX-native engines are stubbed until M2."""
+    library (`ollama pull <tag>`); MLX-native engines (mlx, vllm, sglang) take
+    an HF repo id (e.g. `mlx-community/Qwen2.5-0.5B-Instruct-4bit`) and let
+    mlx-lm resolve it through the HF cache."""
     out: list[ResolvedEngine] = []
     for e in engines:
         if ModelFormat.MLX not in FORMAT_SUPPORT.get(e, set()):
             out.append(ResolvedEngine(e, None, "skipped", "engine does not support mlx"))
             continue
         if e == "ollama":
+            if "/" in model_id and not ollama_tag_override:
+                out.append(
+                    ResolvedEngine(
+                        e,
+                        None,
+                        "skipped",
+                        f"'{model_id}' looks like an HF repo, which Ollama can't pull "
+                        f"directly; pass `--ollama-tag <tag>` (e.g. qwen2.5:0.5b) to also "
+                        f"run ollama",
+                    )
+                )
+                continue
             tag = ollama_tag_override or model_id
             spec = ModelSpec(
                 repo_id=model_id,
@@ -177,9 +191,24 @@ def _resolve_mlx_hub(
             )
             out.append(ResolvedEngine(e, spec, "ready"))
             continue
-        out.append(
-            ResolvedEngine(e, None, "unavailable", "MLX path not yet wired (planned for M2)")
-        )
+        if "/" in model_id:
+            spec = ModelSpec(
+                repo_id=model_id,
+                display_name=model_id.split("/", 1)[-1],
+                format=ModelFormat.MLX,
+                hf_repo=model_id,
+            )
+            out.append(ResolvedEngine(e, spec, "ready"))
+        else:
+            out.append(
+                ResolvedEngine(
+                    e,
+                    None,
+                    "skipped",
+                    f"MLX-native engines require an HF repo "
+                    f"(e.g., `mlx-community/Qwen2.5-0.5B-Instruct-4bit`); got tag '{model_id}'",
+                )
+            )
     return out
 
 

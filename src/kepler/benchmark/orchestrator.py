@@ -169,6 +169,10 @@ def _child_run(engine_name: str, spec, preset: BenchmarkPreset) -> dict:
         from kepler.engines.llamacpp import LlamaCppEngine
 
         engine = LlamaCppEngine()
+    elif engine_name == "mlx":
+        from kepler.engines.mlx import MlxEngine
+
+        engine = MlxEngine()
     elif engine_name == "ollama":
         from kepler.engines.ollama import OLLAMA_BASE_URL, OllamaEngine
 

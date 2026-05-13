@@ -51,12 +51,9 @@ def _probe(name: str) -> EngineCapabilities:
 
         return OllamaEngine().capabilities
     if name == "mlx":
-        return EngineCapabilities(
-            name="mlx",
-            supported_formats={ModelFormat.MLX},
-            available=False,
-            unavailable_reason="not yet implemented (M2)",
-        )
+        from kepler.engines.mlx import MlxEngine
+
+        return MlxEngine().capabilities
     if name == "vllm":
         return EngineCapabilities(
             name="vllm",
