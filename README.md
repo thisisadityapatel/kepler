@@ -2,15 +2,14 @@
 
 Benchmark LLMs on macOS Metal GPUs across multiple inference engines.
 
-Supports `llama.cpp`, `mlx-lm`, and `Ollama` out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory.
+Supports [llama.cpp](https://github.com/ggml-org/llama.cpp), [mlx-lm](https://github.com/ml-explore/mlx-lm), and [Ollama](https://github.com/ollama/ollama) out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory.
 
-Work in progress to add `ik-llama`, `SGLang` and `vLLM` inference engines.
+Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
 
 ## Requirements
 
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv)
-- [Ollama](https://ollama.com) running locally (optional, for the Ollama engine)
 - macOS on Apple Silicon (M Series)
 
 ## Setup
