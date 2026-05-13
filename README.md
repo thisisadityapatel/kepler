@@ -46,7 +46,29 @@ GGUF format:
 uv run kepler benchmark qwen2.5:0.5b --format gguf
 ```
 
-Modes: `quick`, `standard`, `performance`. Results land in `perf/` as JSON.
+Results land in `perf/` as JSON, plus a `comparison_<id>.json` when more than one engine runs.
+
+### Options
+
+| Flag | Values | Description |
+|------|--------|-------------|
+| `--format`, `-f` | `gguf`, `mlx` | Model format. Required unless `--engine` implies one. |
+| `--mode`, `-m` | `quick`, `standard`, `performance` | Preset for iterations, max tokens, and prompt. Default `standard`. |
+| `--engine` | `llamacpp`, `mlx`, `ollama`, `vllm`, `sglang` | Run a single engine (skips comparison output). |
+| `--only-engine` | comma-separated list | Allowlist of engines to run. |
+| `--skip-engine` | comma-separated list | Denylist of engines to skip. |
+| `--cooldown` | integer (seconds) | Pause between engines for thermal recovery. Default `8`. |
+| `--iterations` | integer | Override the preset iteration count. |
+| `--max-tokens` | integer | Override the preset max tokens. |
+| `--temperature` | float | Override the preset temperature. |
+| `--ollama-tag` | string | Override the Ollama tag derived from the model id. |
+| `--offline` | flag | Skip Hugging Face Hub probes; use the local cache only. |
+
+Example — compare just llama.cpp and Ollama in performance mode:
+
+```shell
+uv run kepler benchmark qwen2.5:0.5b --format gguf --mode performance --only-engine llamacpp,ollama
+```
 
 ## Other commands
 
