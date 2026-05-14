@@ -28,7 +28,7 @@ GGUF (for `llama.cpp` / `Ollama`) — drop the .gguf file in `models/`:
 hf download Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q5_k_m.gguf --local-dir models/
 ```
 
-MLX engines fetch their own artifacts from Hugging Face on first run.
+NOTE: MLX engines fetch their own artifacts from Hugging Face on first run.
 
 ## Run
 
