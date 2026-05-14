@@ -13,12 +13,6 @@ Supports [llama.cpp](https://github.com/ggml-org/llama.cpp), [mlx-lm](https://gi
 
 Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
 
-## Requirements
-
-- Python 3.12+
-- [uv](https://github.com/astral-sh/uv)
-- macOS on Apple Silicon (M Series)
-
 ## Setup
 
 ```shell
