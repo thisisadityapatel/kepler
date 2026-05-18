@@ -1,6 +1,9 @@
 # Build
 build/
 
+# llama.cpp source + build artifacts (cloned + compiled on first use of llamacpp-binary engine)
+inference_engines/llama.cpp/
+
 # Downloaded headers (managed by Nix now)
 include/
 

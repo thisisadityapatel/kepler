@@ -165,10 +165,14 @@ def _child_run(engine_name: str, spec, preset: BenchmarkPreset) -> dict:
     host: str | None = None
     port: int | None = None
 
-    if engine_name == "llamacpp":
+    if engine_name == "llamacpp-python":
         from kepler.engines.llamacpp import LlamaCppEngine
 
         engine = LlamaCppEngine()
+    elif engine_name == "llamacpp-binary":
+        from kepler.engines.llamacpp_binary import LlamaCppBinaryEngine
+
+        engine = LlamaCppBinaryEngine()
     elif engine_name == "mlx":
         from kepler.engines.mlx import MlxEngine
 

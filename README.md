@@ -9,7 +9,9 @@
 
 Benchmark LLMs on macOS Metal GPUs across multiple inference engines.
 
-Supports [llama.cpp](https://github.com/ggml-org/llama.cpp), [mlx-lm](https://github.com/ml-explore/mlx-lm), and [Ollama](https://github.com/ollama/ollama) out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory. Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
+Supports [llama.cpp](https://github.com/ggml-org/llama.cpp) (both `llama-cpp-python` bindings and the upstream C++ `llama-server` binary, so you can A/B the two), [mlx-lm](https://github.com/ml-explore/mlx-lm), and [Ollama](https://github.com/ollama/ollama) out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory. Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
+
+The `llamacpp-binary` engine clones and builds llama.cpp on first use into `inference_engines/llama.cpp/` (Metal enabled on macOS). The build is persistent — subsequent runs reuse the same compiled binary. Requires `git` and `cmake` on PATH; the first run takes a few minutes.
 
 ## Setup
 
@@ -52,7 +54,7 @@ Results land in `perf/` as JSON, plus a `comparison_<id>.json` when more than on
 |------|--------|-------------|
 | `--format` | `gguf`, `mlx` | Model format. Required unless `--engine` implies one. |
 | `--mode` | `quick`, `standard`, `performance` | Preset for iterations, max tokens, and prompt. Default `standard`. |
-| `--engine` | `llamacpp`, `mlx`, `ollama`, `vllm`, `sglang` | Run a single engine (skips comparison output). |
+| `--engine` | `llamacpp-python`, `llamacpp-binary`, `mlx`, `ollama`, `vllm`, `sglang` | Run a single engine (skips comparison output). |
 | `--only-engine` | comma-separated list | Allowlist of engines to run. |
 | `--skip-engine` | comma-separated list | Denylist of engines to skip. |
 | `--cooldown` | integer (seconds) | Pause between engines for thermal recovery. Default `8`. |

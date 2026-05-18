@@ -25,7 +25,8 @@ def engines_for_format(fmt: ModelFormat) -> list[str]:
 # ik_llama is intentionally excluded — its only backends are CPU and CUDA
 # (per its README), so it can't run on macOS Metal GPU like the rest.
 ENGINE_ORDER: list[str] = [
-    "llamacpp",
+    "llamacpp-python",
+    "llamacpp-binary",
     "mlx",
     "ollama",
     "vllm",
@@ -33,7 +34,8 @@ ENGINE_ORDER: list[str] = [
 ]
 
 FORMAT_SUPPORT: dict[str, set[ModelFormat]] = {
-    "llamacpp": {ModelFormat.GGUF},
+    "llamacpp-python": {ModelFormat.GGUF},
+    "llamacpp-binary": {ModelFormat.GGUF},
     "mlx": {ModelFormat.MLX},
     "ollama": {ModelFormat.GGUF, ModelFormat.MLX},
     "vllm": {ModelFormat.MLX},
@@ -42,10 +44,14 @@ FORMAT_SUPPORT: dict[str, set[ModelFormat]] = {
 
 
 def _probe(name: str) -> EngineCapabilities:
-    if name == "llamacpp":
+    if name == "llamacpp-python":
         from kepler.engines.llamacpp import LlamaCppEngine
 
         return LlamaCppEngine().capabilities
+    if name == "llamacpp-binary":
+        from kepler.engines.llamacpp_binary import LlamaCppBinaryEngine
+
+        return LlamaCppBinaryEngine().capabilities
     if name == "ollama":
         from kepler.engines.ollama import OllamaEngine
 
