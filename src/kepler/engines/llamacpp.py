@@ -15,7 +15,7 @@ from kepler.models.registry import ModelSpec
 class LlamaCppEngine(InferenceEngine):
     """In-process GGUF via llama-cpp-python with Metal offload."""
 
-    name = "llamacpp"
+    name = "llamacpp-python"
 
     def __init__(self, n_ctx: int = 4096, n_gpu_layers: int = -1):
         self.n_ctx = n_ctx
