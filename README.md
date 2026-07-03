@@ -7,6 +7,8 @@
 ╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝
 ```
 
+
+
 Benchmark LLMs on macOS Metal GPUs across multiple inference engines.
 
 Supports [llama.cpp](https://github.com/ggml-org/llama.cpp) (both `llama-cpp-python` bindings and the upstream C++ `llama-server` binary, so you can A/B the two), [mlx-lm](https://github.com/ml-explore/mlx-lm), and [Ollama](https://github.com/ollama/ollama) out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory. Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
