@@ -1,0 +1,11 @@
+os: linux
+os_version: "24.04"
+arch: amd64
+cpu: { brand: AMD Ryzen 9 7950X, logical_processors: 32 }
+ram_bytes: 68719476736
+accelerators:
+  - { kind: cuda, vendor: nvidia, name: NVIDIA GeForce RTX 4090, mem_bytes: 25757220864, api_version: "12.8", compute_capability: "8.9" }
+  - { kind: cpu, vendor: amd, name: AMD Ryzen 9 7950X, mem_bytes: 68719476736 }
+free_disk_bytes: 900000000000
+power: { source: ac }
+tools: { git: "2.43.0" }

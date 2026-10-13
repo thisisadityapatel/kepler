@@ -1,0 +1,11 @@
+os: darwin
+os_version: "13.6"
+arch: arm64
+cpu: { brand: Apple M1, performance_cores: 4, efficiency_cores: 4, logical_processors: 8 }
+ram_bytes: 8589934592
+accelerators:
+  - { kind: metal, vendor: apple, name: Apple M1, mem_bytes: 5726623061, unified: true, cores: 8 }
+  - { kind: cpu, vendor: apple, name: Apple M1, mem_bytes: 8589934592, unified: true, cores: 8 }
+free_disk_bytes: 50000000000
+power: { source: battery, low_power_mode: true }
+tools: {}
