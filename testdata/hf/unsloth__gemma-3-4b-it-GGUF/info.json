@@ -1,0 +1,163 @@
+{
+ "id": "unsloth/gemma-3-4b-it-GGUF",
+ "sha": "5a3566e716d80f709ed7b79817eaf7733d2a1fce",
+ "tags": [
+  "transformers",
+  "gguf",
+  "gemma3",
+  "image-text-to-text",
+  "unsloth",
+  "gemma",
+  "google",
+  "en",
+  "arxiv:1905.07830",
+  "arxiv:1905.10044",
+  "arxiv:1911.11641",
+  "arxiv:1904.09728",
+  "arxiv:1705.03551",
+  "arxiv:1911.01547",
+  "arxiv:1907.10641",
+  "arxiv:1903.00161",
+  "arxiv:2009.03300",
+  "arxiv:2304.06364",
+  "arxiv:2103.03874",
+  "arxiv:2110.14168",
+  "arxiv:2311.12022",
+  "arxiv:2108.07732",
+  "arxiv:2107.03374",
+  "arxiv:2210.03057",
+  "arxiv:2106.03193",
+  "arxiv:1910.11856",
+  "arxiv:2502.12404",
+  "arxiv:2502.21228",
+  "arxiv:2404.16816",
+  "arxiv:2104.12756",
+  "arxiv:2311.16502",
+  "arxiv:2203.10244",
+  "arxiv:2404.12390",
+  "arxiv:1810.12440",
+  "arxiv:1908.02660",
+  "arxiv:2312.11805",
+  "base_model:google/gemma-3-4b-it",
+  "base_model:quantized:google/gemma-3-4b-it",
+  "license:gemma",
+  "endpoints_compatible",
+  "region:us",
+  "conversational"
+ ],
+ "gated": false,
+ "private": false,
+ "library_name": "transformers",
+ "pipeline_tag": "image-text-to-text",
+ "cardData": {
+  "base_model": "google/gemma-3-4b-it",
+  "license": "gemma"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes"
+  },
+  {
+   "rfilename": "README.md"
+  },
+  {
+   "rfilename": "config.json"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-BF16.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-IQ4_NL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-IQ4_XS.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q2_K.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q2_K_L.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q3_K_M.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q3_K_S.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q4_0.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q4_1.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q4_K_M.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q4_K_S.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q5_K_M.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q5_K_S.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q6_K.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-Q8_0.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-IQ1_M.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-IQ1_S.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-IQ2_M.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-IQ2_XXS.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-IQ3_XXS.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q2_K_XL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q3_K_XL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q4_K_XL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q5_K_XL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q6_K_XL.gguf"
+  },
+  {
+   "rfilename": "gemma-3-4b-it-UD-Q8_K_XL.gguf"
+  },
+  {
+   "rfilename": "imatrix_unsloth.dat"
+  },
+  {
+   "rfilename": "mmproj-BF16.gguf"
+  },
+  {
+   "rfilename": "mmproj-F16.gguf"
+  },
+  {
+   "rfilename": "mmproj-F32.gguf"
+  },
+  {
+   "rfilename": "params"
+  },
+  {
+   "rfilename": "template"
+  }
+ ]
+}

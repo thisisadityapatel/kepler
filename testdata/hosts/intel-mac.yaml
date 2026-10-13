@@ -1,0 +1,10 @@
+os: darwin
+os_version: "15.1"
+arch: amd64
+cpu: { brand: "Intel(R) Core(TM) i9-9880H", logical_processors: 16 }
+ram_bytes: 34359738368
+accelerators:
+  - { kind: cpu, vendor: intel, name: "Intel(R) Core(TM) i9-9880H", mem_bytes: 34359738368, unified: true }
+free_disk_bytes: 100000000000
+power: { source: ac }
+tools: {}

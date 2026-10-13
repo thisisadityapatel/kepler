@@ -1,0 +1,60 @@
+{
+ "id": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+ "sha": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+ "tags": [
+  "mlx",
+  "safetensors",
+  "qwen2",
+  "chat",
+  "text-generation",
+  "conversational",
+  "en",
+  "base_model:Qwen/Qwen2.5-0.5B",
+  "base_model:finetune:Qwen/Qwen2.5-0.5B",
+  "license:apache-2.0",
+  "region:us"
+ ],
+ "gated": false,
+ "private": false,
+ "library_name": "mlx",
+ "pipeline_tag": "text-generation",
+ "cardData": {
+  "base_model": "Qwen/Qwen2.5-0.5B",
+  "license": "apache-2.0"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes"
+  },
+  {
+   "rfilename": "README.md"
+  },
+  {
+   "rfilename": "added_tokens.json"
+  },
+  {
+   "rfilename": "config.json"
+  },
+  {
+   "rfilename": "merges.txt"
+  },
+  {
+   "rfilename": "model.safetensors"
+  },
+  {
+   "rfilename": "model.safetensors.index.json"
+  },
+  {
+   "rfilename": "special_tokens_map.json"
+  },
+  {
+   "rfilename": "tokenizer.json"
+  },
+  {
+   "rfilename": "tokenizer_config.json"
+  },
+  {
+   "rfilename": "vocab.json"
+  }
+ ]
+}

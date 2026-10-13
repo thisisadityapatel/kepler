@@ -1,0 +1,131 @@
+{
+ "id": "unsloth/Qwen3-30B-A3B-GGUF",
+ "sha": "d5b1d57bd0b504ac62ae6c725904e96ef228dc74",
+ "tags": [
+  "transformers",
+  "gguf",
+  "qwen3_moe",
+  "text-generation",
+  "qwen3",
+  "qwen",
+  "unsloth",
+  "en",
+  "arxiv:2309.00071",
+  "base_model:Qwen/Qwen3-30B-A3B",
+  "base_model:quantized:Qwen/Qwen3-30B-A3B",
+  "license:apache-2.0",
+  "endpoints_compatible",
+  "region:us",
+  "imatrix",
+  "conversational"
+ ],
+ "gated": false,
+ "private": false,
+ "library_name": "transformers",
+ "pipeline_tag": "text-generation",
+ "cardData": {
+  "base_model": "Qwen/Qwen3-30B-A3B",
+  "license": "apache-2.0"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes"
+  },
+  {
+   "rfilename": "BF16/Qwen3-30B-A3B-BF16-00001-of-00002.gguf"
+  },
+  {
+   "rfilename": "BF16/Qwen3-30B-A3B-BF16-00002-of-00002.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-IQ4_NL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-IQ4_XS.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q2_K.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q2_K_L.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q3_K_M.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q3_K_S.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q4_0.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q4_1.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q4_K_M.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q4_K_S.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q5_K_M.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q5_K_S.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q6_K.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-Q8_0.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-IQ1_M.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-IQ1_S.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-IQ2_M.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-IQ2_XXS.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-IQ3_XXS.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q2_K_XL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q3_K_XL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q4_K_XL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q5_K_XL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q6_K_XL.gguf"
+  },
+  {
+   "rfilename": "Qwen3-30B-A3B-UD-Q8_K_XL.gguf"
+  },
+  {
+   "rfilename": "README.md"
+  },
+  {
+   "rfilename": "config.json"
+  },
+  {
+   "rfilename": "imatrix_unsloth.dat"
+  },
+  {
+   "rfilename": "params"
+  },
+  {
+   "rfilename": "template"
+  }
+ ]
+}

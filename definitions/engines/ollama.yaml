@@ -1,0 +1,47 @@
+schema: 1
+name: ollama
+display: "Ollama"
+version: "0.40.3"
+formats: [gguf]
+tier: default
+adapter: ollama              # hooks: imports the GGUF with `ollama create` once the server is up
+homepage: https://github.com/ollama/ollama
+
+launch:
+  cmd: "{bin}"
+  args: ["serve"]
+  env:
+    # A private server: own port, own model store inside the run's temp dir. Never
+    # touches the user's Ollama daemon or ~/.ollama/models.
+    OLLAMA_HOST: "127.0.0.1:{port}"
+    OLLAMA_MODELS: "{kepler_home}/tmp/ollama/{run_id}"
+    OLLAMA_NUM_PARALLEL: "1"
+    OLLAMA_MAX_LOADED_MODELS: "1"
+    OLLAMA_KEEP_ALIVE: "-1"
+    OLLAMA_NOPRUNE: "1"
+  ready: { http_get: "/api/version", expect: 200, timeout: 60s }
+
+materialize:
+  modelfile: |
+    FROM {model_path}
+    PARAMETER num_ctx {ctx}
+    PARAMETER temperature 0
+  cmd: ["create", "kepler-{run_id}", "-f", "{modelfile_path}"]
+
+request:
+  api: openai
+  model: "kepler-{run_id}"
+
+caps: { ignore_eos: false, disable_prompt_cache: false, stream_usage: true, engine_timings: false }
+
+targets:
+  - id: macos-metal
+    match: { os: darwin, arch: arm64, accelerator: metal }
+    install:
+      - kind: adopt            # reuse an existing `ollama` on PATH when new enough
+        bin_name: ollama
+        min_version: "0.6.0"
+      - kind: prebuilt
+        url: "https://github.com/ollama/ollama/releases/download/v{version}/ollama-darwin.tgz"
+        sha256: "a2d1d906a2c8febd9cb18f5c183854d0a6db5dc522940d68b0c0ed048e8dfdea"
+        bin: "ollama"
