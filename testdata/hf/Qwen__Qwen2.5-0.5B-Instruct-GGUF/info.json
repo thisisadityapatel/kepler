@@ -1,0 +1,62 @@
+{
+ "id": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+ "sha": "9217f5db79a29953eb74d5343926648285ec7e67",
+ "tags": [
+  "gguf",
+  "chat",
+  "text-generation",
+  "en",
+  "arxiv:2407.10671",
+  "base_model:Qwen/Qwen2.5-0.5B-Instruct",
+  "base_model:quantized:Qwen/Qwen2.5-0.5B-Instruct",
+  "license:apache-2.0",
+  "endpoints_compatible",
+  "region:us",
+  "conversational"
+ ],
+ "gated": false,
+ "private": false,
+ "pipeline_tag": "text-generation",
+ "cardData": {
+  "license": "apache-2.0",
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes"
+  },
+  {
+   "rfilename": "LICENSE"
+  },
+  {
+   "rfilename": "README.md"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-fp16.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q2_k.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q3_k_m.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q4_0.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q4_k_m.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q5_0.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q5_k_m.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q6_k.gguf"
+  },
+  {
+   "rfilename": "qwen2.5-0.5b-instruct-q8_0.gguf"
+  }
+ ]
+}

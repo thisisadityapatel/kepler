@@ -1,0 +1,45 @@
+schema: 1
+name: llamacpp
+display: "llama.cpp (llama-server)"
+version: "b11574"
+formats: [gguf]
+tier: default
+adapter: generic
+homepage: https://github.com/ggml-org/llama.cpp
+
+launch:
+  cmd: "{bin}"
+  args: ["-m", "{model_path}", "--host", "127.0.0.1", "--port", "{port}",
+         "-ngl", "999", "-c", "{ctx}", "-fa", "on", "-np", "1", "--no-webui",
+         "--cache-ram", "0"]   # host-RAM prompt cache grows with every unique prompt; off for fair memory
+  args_if:
+    mmproj: ["--mmproj", "{mmproj_path}"]
+  ready: { http_get: "/health", expect: 200, timeout: 300s }
+
+request:
+  api: openai
+  model: "kepler"
+  extra_body: { ignore_eos: true, cache_prompt: false }
+
+caps: { ignore_eos: true, disable_prompt_cache: true, stream_usage: true, engine_timings: true }
+
+targets:
+  - id: macos-metal
+    match: { os: darwin, arch: arm64, accelerator: metal, os_version: ">=14.0" }
+    install:
+      - kind: prebuilt
+        url: "https://github.com/ggml-org/llama.cpp/releases/download/{version}/llama-{version}-bin-macos-arm64.tar.gz"
+        sha256: "85da72af68fce98663c8dc028d89d79d0083b1bf0d3df34340224c6fdf3a812b"
+        bin: "llama-{version}/llama-server"
+      - kind: source
+        repo: "https://github.com/ggml-org/llama.cpp"
+        ref: "{version}"
+        cmake: ["-DGGML_METAL=ON", "-DLLAMA_CURL=OFF", "-DCMAKE_BUILD_TYPE=Release"]
+        build_targets: [llama-server]
+        bin: "bin/llama-server"
+        needs: [xcode_clt, cmake, git]
+
+  # Future targets are additive, e.g.:
+  # - id: linux-cuda
+  #   match: { os: linux, arch: amd64, accelerator: cuda, accelerator_api: ">=12.4" }
+  #   install: [{ kind: prebuilt, url: "...", sha256: "...", bin: "..." }]

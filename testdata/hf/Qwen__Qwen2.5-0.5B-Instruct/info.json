@@ -1,0 +1,61 @@
+{
+ "id": "Qwen/Qwen2.5-0.5B-Instruct",
+ "sha": "7ae557604adf67be50417f59c2c2f167def9a775",
+ "tags": [
+  "transformers",
+  "safetensors",
+  "qwen2",
+  "text-generation",
+  "chat",
+  "conversational",
+  "en",
+  "arxiv:2407.10671",
+  "base_model:Qwen/Qwen2.5-0.5B",
+  "base_model:finetune:Qwen/Qwen2.5-0.5B",
+  "license:apache-2.0",
+  "text-generation-inference",
+  "endpoints_compatible",
+  "deploy:azure",
+  "region:us"
+ ],
+ "gated": false,
+ "private": false,
+ "library_name": "transformers",
+ "pipeline_tag": "text-generation",
+ "cardData": {
+  "license": "apache-2.0",
+  "base_model": "Qwen/Qwen2.5-0.5B"
+ },
+ "siblings": [
+  {
+   "rfilename": ".gitattributes"
+  },
+  {
+   "rfilename": "LICENSE"
+  },
+  {
+   "rfilename": "README.md"
+  },
+  {
+   "rfilename": "config.json"
+  },
+  {
+   "rfilename": "generation_config.json"
+  },
+  {
+   "rfilename": "merges.txt"
+  },
+  {
+   "rfilename": "model.safetensors"
+  },
+  {
+   "rfilename": "tokenizer.json"
+  },
+  {
+   "rfilename": "tokenizer_config.json"
+  },
+  {
+   "rfilename": "vocab.json"
+  }
+ ]
+}
