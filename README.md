@@ -7,72 +7,76 @@
 ╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝
 ```
 
+Benchmark any LLM across every inference engine your machine can run.
 
+> **Status:** Kepler 2.0 is a rewrite in Go, under active development. Engine setup and
+> benchmarking work today on Apple Silicon.
 
-Benchmark LLMs on macOS Metal GPUs across multiple inference engines.
+## Supported
 
-Supports [llama.cpp](https://github.com/ggml-org/llama.cpp) (both `llama-cpp-python` bindings and the upstream C++ `llama-server` binary, so you can A/B the two), [mlx-lm](https://github.com/ml-explore/mlx-lm), and [Ollama](https://github.com/ollama/ollama) out of the box, with a unified CLI for running the same model across engines and comparing throughput, TTFT, and memory. Work in progress to add [ik-llama](https://github.com/ikawrakow/ik_llama.cpp), [SGLang](https://github.com/sgl-project/sglang) and [vLLM](https://github.com/vllm-project/vllm) inference engines.
+| Engine | Format | Apple Silicon |
+|---|---|---|
+| [llama.cpp](https://github.com/ggml-org/llama.cpp) (`llama-server`) | GGUF | ✓ |
+| [MLX](https://github.com/ml-explore/mlx-lm) (`mlx_lm.server`) | MLX | ✓ |
+| [Ollama](https://github.com/ollama/ollama) | GGUF | ✓ |
+| [vLLM](https://github.com/vllm-project/vllm), [SGLang](https://github.com/sgl-project/sglang) | safetensors | planned |
 
-The `llamacpp-binary` engine clones and builds llama.cpp on first use into `inference_engines/llama.cpp/` (Metal enabled on macOS). The build is persistent — subsequent runs reuse the same compiled binary. Requires `git` and `cmake` on PATH; the first run takes a few minutes.
+NVIDIA and AMD support is planned. Engines are YAML definitions matched against detected
+hardware, so new engines and platforms are added without changing Kepler's core.
 
-## Setup
+## Build
 
-```shell
-git clone https://github.com/thisisadityapatel/kepler.git
-cd kepler
-uv venv
-uv sync
-```
-
-## Get a model
-
-GGUF (for `llama.cpp` / `Ollama`) — drop the .gguf file in `models/`:
-
-```shell
-hf download Qwen/Qwen2.5-0.5B-Instruct-GGUF qwen2.5-0.5b-instruct-q5_k_m.gguf --local-dir models/
-```
-
-NOTE: MLX engines fetch their own artifacts from Hugging Face on first run.
-
-## Run
-
-MLX format:
+Requires Go 1.25+.
 
 ```shell
-uv run kepler benchmark mlx-community/Qwen2.5-0.5B-Instruct-4bit --format mlx
+make build        # → bin/kepler
+make test         # unit tests (no network)
 ```
 
-GGUF format:
+## Usage
 
 ```shell
-uv run kepler benchmark qwen2.5:0.5b --format gguf
+kepler init                                        # detect hardware, install + health-check engines
+kepler bench Qwen/Qwen2.5-1.5B-Instruct-GGUF       # benchmark every ready engine for this model
+kepler bench unsloth/gemma-3-4b-it-GGUF:Q8_0 --preset quick
+kepler bench https://huggingface.co/mlx-community/Qwen2.5-0.5B-Instruct-4bit
+kepler results list                                # saved results, newest first
+kepler results show <file>                         # re-render a result or comparison
+kepler engines list                                # every engine, whether it can run here, and why
+kepler doctor                                      # hardware report + re-run health checks
+kepler clean                                       # remove leftovers from interrupted runs
 ```
 
-Results land in `perf/` as JSON, plus a `comparison_<id>.json` when more than one engine runs.
+`kepler bench` resolves the Hugging Face repo to a pinned commit, picks a quant
+(`Q4_K_M` by default, or the best that fits), checks memory and disk, downloads the
+model, benchmarks each engine one at a time, writes one JSON file per engine to
+`~/.kepler/results`, and deletes the model afterwards (`--keep` to retain it).
 
-### Options
+| Preset | Scenarios | Iterations |
+|---|---|---|
+| `quick` | chat (256 tokens out), prefill-2k | 3 |
+| `standard` (default) | chat, prefill-2k, prefill-8k, depth-16k | 5 |
+| `full` | chat, prefill-2k/8k, depth-4k/16k/32k | 10 |
 
-| Flag | Values | Description |
-|------|--------|-------------|
-| `--format` | `gguf`, `mlx` | Model format. Required unless `--engine` implies one. |
-| `--mode` | `quick`, `standard`, `performance` | Preset for iterations, max tokens, and prompt. Default `standard`. |
-| `--engine` | `llamacpp-python`, `llamacpp-binary`, `mlx`, `ollama`, `vllm`, `sglang` | Run a single engine (skips comparison output). |
-| `--only-engine` | comma-separated list | Allowlist of engines to run. |
-| `--skip-engine` | comma-separated list | Denylist of engines to skip. |
-| `--cooldown` | integer (seconds) | Pause between engines for thermal recovery. Default `8`. |
-| `--iterations` | integer | Override the preset iteration count. |
-| `--max-tokens` | integer | Override the preset max tokens. |
-| `--temperature` | float | Override the preset temperature. |
-| `--ollama-tag` | string | Override the Ollama tag derived from the model id. |
-| `--offline` | flag | Skip Hugging Face Hub probes; use the local cache only. |
+Each result records load time, TTFT, prefill and decode tokens/s, inter-token latency
+(p50/p99), and peak memory (phys_footprint plus resident memory-mapped weights), with
+p10/median/p90 per scenario. Every engine gets the same prompts (calibrated to the
+model's tokenizer), `temperature=0`, a fixed seed, and a unique per-request prefix so
+prompt caches can't help. Runs where an engine couldn't honor the spec, or the machine
+was on battery or throttled, are marked `degraded` with the reasons.
 
-## Other commands
+Set `HF_TOKEN` for gated repositories.
 
-```shell
-uv run kepler list-engines     # show engines and availability
-uv run kepler list-models      # show locally downloaded models
-uv run kepler results          # summarize past runs
-```
+Everything Kepler installs or downloads lives in `~/.kepler` (override with
+`KEPLER_HOME` or `--home`). Kepler never uses your Hugging Face cache or your Ollama
+model store, and an existing `ollama` on your `PATH` is reused but never modified.
+
+## Adding an engine
+
+Drop a YAML definition in `definitions/engines/` (shipped) or `~/.kepler/engines.d/`
+(local). Engines that expose an OpenAI-compatible streaming endpoint need no Go code.
+See `definitions/engines/llamacpp.yaml` for a complete example and
+`internal/engines/def/types.go` for the schema.
 
 ## License
 

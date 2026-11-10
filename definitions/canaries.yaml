@@ -1,0 +1,27 @@
+# Health-check models, one per format. Used by `kepler init` / `kepler doctor` to prove
+# an installed engine can load a model and generate. Kept permanently in ~/.kepler/canary.
+# Both are SmolLM2-135M-Instruct so GGUF and MLX canaries are the same model.
+schema: 1
+canaries:
+  gguf:
+    repo: bartowski/SmolLM2-135M-Instruct-GGUF
+    revision: 09816acd5d99df7be770d85ea30822623dab342c
+    entry: SmolLM2-135M-Instruct-Q4_K_M.gguf
+    files:
+      - path: SmolLM2-135M-Instruct-Q4_K_M.gguf
+        size: 105454432
+        sha256: 2e8040ceae7815abe0dcb3540b9995eaa1fa0d2ca9e797d0a635ae4433c68c2d
+
+  mlx:
+    repo: mlx-community/SmolLM2-135M-Instruct-8bit
+    revision: 0f0d9b8218915bc34d401e1a340b8c049d300d5e
+    entry: ""
+    files:
+      - { path: config.json,                  size: 1097,      git_oid: 3fc6789433d2493046392d99ca3fe5249e2d1f90 }
+      - { path: merges.txt,                   size: 466391,    git_oid: 69503b13f727ba3812b6803e97442a6de05ef5eb }
+      - { path: model.safetensors,            size: 143030401, sha256: ec569c771e56424636be99625aba9031abc525a68a5f4ab16d678eca96fef12c }
+      - { path: model.safetensors.index.json, size: 48979,     git_oid: dcae9bf3e7a3071a0229270951adeff679fbe3e6 }
+      - { path: special_tokens_map.json,      size: 655,       git_oid: 44719d2e365acac0637fd25a3acf46494ca45940 }
+      - { path: tokenizer.json,               size: 3522656,   git_oid: a7d434dcaa7ae62910bed536fb292282905c9b44 }
+      - { path: tokenizer_config.json,        size: 3764,      git_oid: 76b6b266c3d0a53828e0fdd281dd9bb76d0bed78 }
+      - { path: vocab.json,                   size: 800662,    git_oid: 0ad5ecc2035b7031b88afb544ee95e2d49baa484 }

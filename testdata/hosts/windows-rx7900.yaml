@@ -1,0 +1,11 @@
+os: windows
+os_version: "10.0.22631"
+arch: amd64
+cpu: { brand: AMD Ryzen 7 7800X3D, logical_processors: 16 }
+ram_bytes: 34359738368
+accelerators:
+  - { kind: vulkan, vendor: amd, name: AMD Radeon RX 7900 XTX, mem_bytes: 25753026560, api_version: "1.3" }
+  - { kind: cpu, vendor: amd, name: AMD Ryzen 7 7800X3D, mem_bytes: 34359738368 }
+free_disk_bytes: 500000000000
+power: { source: ac }
+tools: {}

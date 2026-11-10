@@ -1,0 +1,25 @@
+# No targets yet: resolves to ineligible everywhere.
+schema: 1
+name: sglang
+display: "SGLang"
+version: ""
+formats: [safetensors]
+tier: lazy
+adapter: generic
+homepage: https://github.com/sgl-project/sglang
+
+launch:
+  cmd: "{bin}"
+  args: ["--model-path", "{model_path}", "--host", "127.0.0.1", "--port", "{port}", "--context-length", "{ctx}"]
+  ready: { http_get: "/health", expect: 200, timeout: 600s }
+
+request:
+  api: openai
+  model: "{model_path}"
+  extra_body: { ignore_eos: true }
+
+caps: { ignore_eos: true, disable_prompt_cache: false, stream_usage: true, engine_timings: false }
+
+unsupported:
+  - match: { os: darwin }
+    reason: "SGLang's MLX backend is experimental on Apple Silicon; planned for a later release"

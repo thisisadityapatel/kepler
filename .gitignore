@@ -1,46 +1,17 @@
-# Build
-build/
-
-# llama.cpp source + build artifacts (cloned + compiled on first use of llamacpp-binary engine)
-inference_engines/llama.cpp/
-
-# Downloaded headers (managed by Nix now)
-include/
-
-# Models — large binary files, never commit
-models/*.gguf
-models/.cache/
-models/**/*.gguf
-models/**/*.safetensors
-models/**/*.bin
-
-# Benchmark results
-perf/*.json
-
-# Nix
-.direnv/
+# Build output
+/bin/
+/dist/
+*.test
+*.out
+coverage.txt
 
 # macOS
 .DS_Store
 
 # Editor
 .idea/
+.vscode/
 *.swp
 
 # Claude
 .claude/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-.venv/
-venv/
-.env
-.mypy_cache/
-.ruff_cache/
-.pytest_cache/
-dist/
-.tox/
-uv.lock.bak

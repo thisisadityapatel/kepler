@@ -1,0 +1,26 @@
+# No targets yet: resolves to ineligible everywhere. Adding a target (e.g. linux-cuda)
+# makes it eligible on matching hosts without code changes.
+schema: 1
+name: vllm
+display: "vLLM"
+version: ""
+formats: [safetensors]
+tier: lazy
+adapter: generic
+homepage: https://github.com/vllm-project/vllm
+
+launch:
+  cmd: "{bin}"
+  args: ["serve", "{model_path}", "--host", "127.0.0.1", "--port", "{port}", "--max-model-len", "{ctx}"]
+  ready: { http_get: "/health", expect: 200, timeout: 600s }
+
+request:
+  api: openai
+  model: "{model_path}"
+  extra_body: { ignore_eos: true }
+
+caps: { ignore_eos: true, disable_prompt_cache: false, stream_usage: true, engine_timings: false }
+
+unsupported:
+  - match: { os: darwin }
+    reason: "vllm-metal is experimental on Apple Silicon; planned for a later release"
